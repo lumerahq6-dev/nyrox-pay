@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>Nyrox Checkout</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a0f;color:#fff;font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+  h1{font-size:clamp(22px,5vw,36px);font-weight:900;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:rgba(255,255,255,.6);text-align:center;font-size:14px;margin-bottom:40px}
+  .cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:860px;width:100%}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 24px;flex:1 1 240px;max-width:280px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s,transform .2s}
+  .card:hover{border-color:rgba(139,92,246,.6);transform:translateY(-2px)}
+  .card.featured{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.07)}
+  .badge{font-size:11px;font-weight:700;letter-spacing:.06em;color:#a78bfa;text-transform:uppercase;margin-bottom:4px}
+  .price{font-size:36px;font-weight:900;color:#fff}
+  .price span{font-size:14px;font-weight:600;color:rgba(255,255,255,.5)}
+  .desc{font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;flex:1}
+  .btn{margin-top:16px;padding:14px;border-radius:10px;border:none;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:opacity .15s}
+  .btn-basic{background:#6366f1;color:#fff}
+  .btn-premium{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff}
+  .btn-life{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff}
+  .btn:hover{opacity:.88}
+  .note{margin-top:32px;font-size:12px;color:rgba(255,255,255,.35);text-align:center}
+  .redirecting{display:none;text-align:center;padding:32px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.3);border-radius:16px;max-width:440px}
+  .redirecting h2{color:#a5b4fc;font-size:20px;margin-bottom:10px}
+  .redirecting p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.6}
+  .spinner{display:inline-block;width:36px;height:36px;border:3px solid rgba(167,139,250,.2);border-top-color:#a78bfa;border-radius:50%;animation:spin 1s linear infinite;margin:14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="main-content">
+  <h1>Choose Your Plan</h1>
+  <p class="sub">Secure one-time payment. No subscription, no recurring charges.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="badge">Basic</div>
+      <div class="price">$9.99 <span>one-time</span></div>
+      <p class="desc">Standard membership access. One-time payment, no recurring billing.</p>
+      <button class="btn btn-basic" onclick="pay('basic')">Continue &mdash; $9.99</button>
+    </div>
+    <div class="card featured">
+      <div class="badge" style="color:#c4b5fd">Premium &nbsp;&#11088; Most Popular</div>
+      <div class="price">$24.99 <span>one-time</span></div>
+      <p class="desc">Full membership access. One-time payment, no recurring billing.</p>
+      <button class="btn btn-premium" onclick="pay('premium')">Continue &mdash; $24.99</button>
+    </div>
+    <div class="card">
+      <div class="badge" style="color:#fbbf24">Lifetime &nbsp;&#127942;</div>
+      <div class="price">$39.99 <span>one-time</span></div>
+      <p class="desc">Lifetime membership. One-time payment, never charged again.</p>
+      <button class="btn btn-life" onclick="pay('exclusive')">Continue &mdash; $39.99</button>
+    </div>
+  </div>
+  <p class="note">&#128274; Secure payment via Stripe</p>
+</div>
+<div class="redirecting" id="redirecting">
+  <h2>Redirecting to secure checkout...</h2>
+  <div class="spinner"></div>
+  <p>You&rsquo;ll be sent to Stripe to complete your one-time payment.</p>
+</div>
+<script>
+var LINKS={basic:'https://buy.stripe.com/4gM4gz4Hd5z5chwghXfrW03',premium:'https://buy.stripe.com/fZubJ1c9F4v1bds0iZfrW04',exclusive:'https://buy.stripe.com/6oUdR9gpV6D96Xc1n3frW05'};
+var params=new URLSearchParams(window.location.search);
+var tok=params.get('tok')||'';
+var autoplan=params.get('plan')||'';
+function pay(plan){
+  var url=LINKS[plan];if(!url)return;
+  if(tok){try{var u=new URL(url);u.searchParams.set('client_reference_id',tok);url=u.toString();}catch(e){}}
+  document.getElementById('main-content').style.display='none';
+  document.getElementById('redirecting').style.display='block';
+  setTimeout(function(){window.location.href=url;},250);
+}
+if(autoplan && LINKS[autoplan]){pay(autoplan);}
+</script>
+</body>
+</html>

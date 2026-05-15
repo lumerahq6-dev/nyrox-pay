@@ -37,9 +37,21 @@
 // custom_tok=<HMAC token issued by pornyard/api/sellauth/issue>.
 (function(){
   var p = new URLSearchParams(window.location.search);
-  var tok = p.get('tok') || p.get('custom_tok') || '';
   var orderId = p.get('order') || p.get('invoice') || p.get('invoice_id') || p.get('order_id') || '';
   var plan = p.get('plan') || '';
+  // Token was stashed in localStorage by /index.html at buy-click time.
+  // Same origin → it's available here after the SellAuth round trip.
+  var tok = '';
+  try {
+    var raw = localStorage.getItem('pyTok');
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      // 6h sanity window (token's HMAC also has its own expiry server-side).
+      if (parsed && parsed.tok && (Date.now() - (parsed.ts || 0)) < 6*60*60*1000) {
+        tok = parsed.tok;
+      }
+    }
+  } catch (e) {}
 
   // Endpoint host. Hardcoded to pornyard since this static page runs in the
   // buyer's browser; SellAuth never sees this call.

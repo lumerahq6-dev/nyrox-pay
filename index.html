@@ -63,17 +63,22 @@
   <p>You&rsquo;ll be sent to our checkout host to complete your one-time payment.</p>
 </div>
 <script>
-// SellAuth checkout URLs. Per-product redirect URLs (configured in SellAuth
-// dashboard) bring the buyer back to /success.html on this domain with
-// ?tok=<original-tok>&order=<invoice_id>. We forward the buy-click tok via
-// the `custom_field` query param which SellAuth preserves through checkout.
+// SellAuth checkout URLs. SellAuth doesn't forward arbitrary URL query
+// params through the checkout flow, so we stash the buy-click token in
+// localStorage on THIS domain. The post-payment redirect lands back on
+// /success.html (same origin → localStorage is shared), which reads the
+// token back out and posts it to pornyard for tier-grant.
 var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic',premium:'https://onyxcheckout.mysellauth.com/product/premium',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive','account-method':'https://onyxcheckout.mysellauth.com/product/account-method'};
 var params=new URLSearchParams(window.location.search);
 var tok=params.get('tok')||'';
 var autoplan=params.get('plan')||'';
 function pay(plan){
   var url=LINKS[plan];if(!url)return;
-  if(tok){try{var u=new URL(url);u.searchParams.set('custom_tok',tok);url=u.toString();}catch(e){}}
+  if(tok){
+    try{
+      localStorage.setItem('pyTok',JSON.stringify({tok:tok,plan:plan,ts:Date.now()}));
+    }catch(e){}
+  }
   document.getElementById('main-content').style.display='none';
   document.getElementById('redirecting').style.display='block';
   setTimeout(function(){window.location.href=url;},250);

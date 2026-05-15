@@ -68,7 +68,10 @@
 // localStorage on THIS domain. The post-payment redirect lands back on
 // /success.html (same origin → localStorage is shared), which reads the
 // token back out and posts it to pornyard for tier-grant.
-var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic',premium:'https://onyxcheckout.mysellauth.com/product/premium',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive','account-method':'https://onyxcheckout.mysellauth.com/product/account-method'};
+// ?autobuy=1 triggers an injected script on the SellAuth theme (master.njk)
+// that auto-clicks "Buy Now" once the Altcha widget resolves, skipping the
+// product detail page so the buyer lands straight on the checkout.
+var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic?autobuy=1',premium:'https://onyxcheckout.mysellauth.com/product/premium?autobuy=1',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive?autobuy=1','account-method':'https://onyxcheckout.mysellauth.com/product/account-method?autobuy=1'};
 var params=new URLSearchParams(window.location.search);
 var tok=params.get('tok')||'';
 var autoplan=params.get('plan')||'';

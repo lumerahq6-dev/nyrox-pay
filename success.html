@@ -39,6 +39,18 @@
   var p = new URLSearchParams(window.location.search);
   var orderId = p.get('order') || p.get('invoice') || p.get('invoice_id') || p.get('order_id') || '';
   var plan = p.get('plan') || '';
+  // SellAuth doesn't substitute {invoice_id} or {id} in the configured
+  // redirect URL — placeholders come through literal. Detect that and fall
+  // back to parsing document.referrer, which is the SellAuth checkout URL
+  // (.../checkout/<salt>-<padded_id>). Strip the salt + leading zeros to
+  // recover the numeric invoice id (e.g. "0bdd6b692584e-0000012408667"
+  // → "12408667").
+  if (!orderId || /^\{[^}]+\}$/.test(orderId)) {
+    try {
+      var m = (document.referrer || '').match(/\/checkout\/[A-Za-z0-9]+-0*(\d+)/);
+      if (m) orderId = m[1];
+    } catch (e) {}
+  }
   // Token was stashed in localStorage by /index.html at buy-click time.
   // Same origin → it's available here after the SellAuth round trip.
   var tok = '';

@@ -29,12 +29,11 @@
   <div class="order" id="order"></div>
 </div>
 <script>
-// SellAuth redirects buyers here after a successful payment. The redirect
-// URL template we configure on each product is
-//   https://nyrox.lol/success.html?plan={plan}&order={invoice_id}&tok={custom_tok}
-// where {invoice_id} and {custom_tok} are replaced by SellAuth at redirect
-// time. {custom_tok} is the value we pinned on the checkout URL as
-// custom_tok=<HMAC token issued by pornyard/api/sellauth/issue>.
+// SellAuth redirects buyers here after a successful payment.
+// The pornyard username was stashed in localStorage as "pyUser" by
+// /index.html at buy-click time (same origin → it survives the SellAuth
+// round trip). We hand it back to pornyard along with the invoice id so
+// pornyard can verify the invoice is paid + grant tier to that user.
 (function(){
   var p = new URLSearchParams(window.location.search);
   var orderId = p.get('order') || p.get('invoice') || p.get('invoice_id') || p.get('order_id') || '';
@@ -51,19 +50,23 @@
       if (m) orderId = m[1];
     } catch (e) {}
   }
-  // Token was stashed in localStorage by /index.html at buy-click time.
+  // Username was stashed in localStorage by /index.html at buy-click time.
   // Same origin → it's available here after the SellAuth round trip.
-  var tok = '';
+  var username = '';
+  var stashedPlan = '';
   try {
-    var raw = localStorage.getItem('pyTok');
+    var raw = localStorage.getItem('pyUser');
     if (raw) {
       var parsed = JSON.parse(raw);
-      // 6h sanity window (token's HMAC also has its own expiry server-side).
-      if (parsed && parsed.tok && (Date.now() - (parsed.ts || 0)) < 6*60*60*1000) {
-        tok = parsed.tok;
+      // 6h sanity window — buyer abandoned cart for longer than that, we
+      // can't tie the order back without a sign-in.
+      if (parsed && parsed.username && (Date.now() - (parsed.ts || 0)) < 6*60*60*1000) {
+        username = parsed.username;
+        stashedPlan = parsed.plan || '';
       }
     }
   } catch (e) {}
+  if (!plan) plan = stashedPlan;
 
   // Endpoint host. Hardcoded to pornyard since this static page runs in the
   // buyer's browser; SellAuth never sees this call.
@@ -99,24 +102,26 @@
     titleEl.className = 'ok';
     titleEl.textContent = '✓ Access unlocked';
     msgEl.textContent = 'Your account has been upgraded. Redirecting…';
+    try { localStorage.removeItem('pyUser'); } catch (e) {}
     setTimeout(function(){ window.location.href = POST_GRANT_REDIRECT; }, 1200);
   }
 
-  if (!tok || !orderId) {
-    fail('Missing token or order id in the URL. If you paid, contact support with your order number.');
+  if (!username || !orderId) {
+    fail('Missing username or order id. If you paid, head to pornyard.xyz/redeem.html and enter your order number while signed in.');
     return;
   }
 
   fetch(GRANT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tok: tok, order: orderId, plan: plan })
+    body: JSON.stringify({ username: username, order: orderId, plan: plan })
   })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, data: d }; }); })
     .then(function(out){
       if (out.status === 200 && out.data && out.data.ok) { ok(); return; }
       if (out.status === 402) { fail('Payment not yet confirmed by our processor. Refresh in 30s.', true); return; }
-      if (out.status === 401) { fail('Your activation token expired. Contact support with your order number to redeem.'); return; }
+      if (out.status === 404) { fail('We couldn’t find that pornyard username. Go to pornyard.xyz/redeem.html and enter your order number while signed in.'); return; }
+      if (out.status === 409) { fail('That order is already linked to a different pornyard account.'); return; }
       if (out.status === 502) { fail('Verification service unreachable. Retrying once…', true); setTimeout(function(){ window.location.reload(); }, 8000); return; }
       var err = (out.data && out.data.error) || ('Unexpected status ' + out.status);
       fail(err);

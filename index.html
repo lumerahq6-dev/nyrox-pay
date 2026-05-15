@@ -64,22 +64,22 @@
 </div>
 <script>
 // SellAuth checkout URLs. SellAuth doesn't forward arbitrary URL query
-// params through the checkout flow, so we stash the buy-click token in
+// params through the checkout flow, so we stash the pornyard username in
 // localStorage on THIS domain. The post-payment redirect lands back on
 // /success.html (same origin → localStorage is shared), which reads the
-// token back out and posts it to pornyard for tier-grant.
+// username back out and posts it to pornyard for tier-grant.
 // ?autobuy=1 triggers an injected script on the SellAuth theme (master.njk)
 // that auto-clicks "Buy Now" once the Altcha widget resolves, skipping the
 // product detail page so the buyer lands straight on the checkout.
 var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic?autobuy=1',premium:'https://onyxcheckout.mysellauth.com/product/premium?autobuy=1',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive?autobuy=1','account-method':'https://onyxcheckout.mysellauth.com/product/account-method?autobuy=1'};
 var params=new URLSearchParams(window.location.search);
-var tok=params.get('tok')||'';
+var pyuser=params.get('user')||params.get('username')||'';
 var autoplan=params.get('plan')||'';
 function pay(plan){
   var url=LINKS[plan];if(!url)return;
-  if(tok){
+  if(pyuser){
     try{
-      localStorage.setItem('pyTok',JSON.stringify({tok:tok,plan:plan,ts:Date.now()}));
+      localStorage.setItem('pyUser',JSON.stringify({username:pyuser,plan:plan,ts:Date.now()}));
     }catch(e){}
   }
   document.getElementById('main-content').style.display='none';

@@ -55,21 +55,25 @@
       <button class="btn btn-life" onclick="pay('exclusive')">Continue &mdash; $39.99</button>
     </div>
   </div>
-  <p class="note">&#128274; Secure payment via Stripe</p>
+  <p class="note">&#128274; Secure one-time payment</p>
 </div>
 <div class="redirecting" id="redirecting">
   <h2>Redirecting to secure checkout...</h2>
   <div class="spinner"></div>
-  <p>You&rsquo;ll be sent to Stripe to complete your one-time payment.</p>
+  <p>You&rsquo;ll be sent to our checkout host to complete your one-time payment.</p>
 </div>
 <script>
-var LINKS={basic:'https://buy.stripe.com/3cIcN53D9bXtepE5DjfrW07',premium:'https://buy.stripe.com/fZubJ1c9F4v1bds0iZfrW04',exclusive:'https://buy.stripe.com/6oUdR9gpV6D96Xc1n3frW05','account-method':'https://buy.stripe.com/8x26oH2z5gdJ81g6HnfrW06'};
+// SellAuth checkout URLs. Per-product redirect URLs (configured in SellAuth
+// dashboard) bring the buyer back to /success.html on this domain with
+// ?tok=<original-tok>&order=<invoice_id>. We forward the buy-click tok via
+// the `custom_field` query param which SellAuth preserves through checkout.
+var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic',premium:'https://onyxcheckout.mysellauth.com/product/premium',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive','account-method':'https://onyxcheckout.mysellauth.com/product/account-method'};
 var params=new URLSearchParams(window.location.search);
 var tok=params.get('tok')||'';
 var autoplan=params.get('plan')||'';
 function pay(plan){
   var url=LINKS[plan];if(!url)return;
-  if(tok){try{var u=new URL(url);u.searchParams.set('client_reference_id',tok);url=u.toString();}catch(e){}}
+  if(tok){try{var u=new URL(url);u.searchParams.set('custom_tok',tok);url=u.toString();}catch(e){}}
   document.getElementById('main-content').style.display='none';
   document.getElementById('redirecting').style.display='block';
   setTimeout(function(){window.location.href=url;},250);

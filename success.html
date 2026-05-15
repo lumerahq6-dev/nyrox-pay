@@ -4,131 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<title>Activating your access...</title>
+<meta name="robots" content="noindex,nofollow">
+<title>Enrollment Confirmed — Alpha Course</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0a0a0f;color:#fff;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:24px}
-  .card{max-width:520px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:40px 32px}
-  h1{font-size:32px;font-weight:900;margin-bottom:12px}
-  h1.ok{color:#4ade80}
-  h1.err{color:#f87171}
-  p{color:rgba(255,255,255,.7);font-size:15px;line-height:1.55;margin-bottom:14px}
-  .spinner{display:inline-block;width:48px;height:48px;border:4px solid rgba(167,139,250,.18);border-top-color:#a78bfa;border-radius:50%;animation:spin 1s linear infinite;margin:18px 0}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .btn{display:inline-block;margin-top:20px;padding:14px 28px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;text-decoration:none;font-weight:800;font-size:15px}
-  .btn:hover{opacity:.9}
-  .small{font-size:12px;color:rgba(255,255,255,.4);margin-top:8px}
-  .order{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:rgba(255,255,255,.5);margin-top:14px;word-break:break-all}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#08080c;color:#f5f5f7;font-family:'Inter',-apple-system,system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.card{max-width:480px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:48px 36px}
+.check{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#ffd97a,#d4a857);display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+.check svg{width:34px;height:34px;color:#1c1408}
+h1{font-size:26px;font-weight:900;margin-bottom:10px;letter-spacing:-.4px}
+.sub{font-size:15px;color:rgba(245,245,247,.6);margin-bottom:30px;line-height:1.55}
+.btn{display:inline-block;padding:14px 28px;background:linear-gradient(135deg,#ffd97a,#d4a857);color:#1c1408;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:.4px;transition:transform .15s,filter .15s;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.muted{font-size:12px;color:rgba(245,245,247,.35);margin-top:20px;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.spinner{display:inline-block;width:42px;height:42px;border:3px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:spin 1s linear infinite;margin:0 0 22px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{color:#ff8888}
 </style>
 </head>
 <body>
 <div class="card" id="card">
-  <h1 id="title">Activating your access...</h1>
   <div class="spinner" id="spin"></div>
-  <p id="msg">Hang tight — we&rsquo;re verifying your purchase and unlocking your account.</p>
-  <div class="order" id="order"></div>
+  <h1 id="title">Confirming your enrollment...</h1>
+  <p class="sub" id="msg">Hang tight — we're verifying your payment with the processor.</p>
+  <div class="muted" id="order"></div>
 </div>
 <script>
-// SellAuth redirects buyers here after a successful payment.
-// The pornyard username was stashed in localStorage as "pyUser" by
-// /index.html at buy-click time (same origin → it survives the SellAuth
-// round trip). We hand it back to pornyard along with the invoice id so
-// pornyard can verify the invoice is paid + grant tier to that user.
+// The processor redirects buyers here after payment, appending order
+// identifiers to this URL. We:
+//   1. Ask the Worker to confirm the order is paid.
+//   2. On success, look up localStorage.ac_ret (stashed by the landing
+//      page from the upstream's ?r= param) and redirect the buyer there
+//      with referrerpolicy=no-referrer so the destination's logs stay
+//      clean.
+//   3. If localStorage is empty (anyone hitting this page without a prior
+//      visit through the upstream-handoff form) we just show a generic
+//      confirmation. No outbound link, no return URL exposed.
 (function(){
-  var p = new URLSearchParams(window.location.search);
-  var orderId = p.get('order') || p.get('invoice') || p.get('invoice_id') || p.get('order_id') || '';
-  var plan = p.get('plan') || '';
-  // SellAuth doesn't substitute {invoice_id} or {id} in the configured
-  // redirect URL — placeholders come through literal. Detect that and fall
-  // back to parsing document.referrer, which is the SellAuth checkout URL
-  // (.../checkout/<salt>-<padded_id>). Strip the salt + leading zeros to
-  // recover the numeric invoice id (e.g. "0bdd6b692584e-0000012408667"
-  // → "12408667").
-  if (!orderId || /^\{[^}]+\}$/.test(orderId)) {
-    try {
-      var m = (document.referrer || '').match(/\/checkout\/[A-Za-z0-9]+-0*(\d+)/);
-      if (m) orderId = m[1];
-    } catch (e) {}
-  }
-  // Username was stashed in localStorage by /index.html at buy-click time.
-  // Same origin → it's available here after the SellAuth round trip.
-  var username = '';
-  var stashedPlan = '';
-  try {
-    var raw = localStorage.getItem('pyUser');
-    if (raw) {
-      var parsed = JSON.parse(raw);
-      // 6h sanity window — buyer abandoned cart for longer than that, we
-      // can't tie the order back without a sign-in.
-      if (parsed && parsed.username && (Date.now() - (parsed.ts || 0)) < 6*60*60*1000) {
-        username = parsed.username;
-        stashedPlan = parsed.plan || '';
-      }
-    }
-  } catch (e) {}
-  if (!plan) plan = stashedPlan;
+  var WORKER_BASE = 'https://api.1hour100k.xyz';
+  var params = new URLSearchParams(window.location.search);
+  // Square appends orderId and transactionId to the redirect URL after
+  // a successful payment. Fall back to legacy parameter names so this
+  // page keeps working if the processor changes the param naming.
+  var orderId = params.get('orderId')
+             || params.get('order_id')
+             || params.get('transactionId')
+             || params.get('session_id')
+             || '';
 
-  // Endpoint host. Hardcoded to pornyard since this static page runs in the
-  // buyer's browser; SellAuth never sees this call.
-  var GRANT_URL = 'https://pornyard.xyz/api/sellauth/claim';
-  var POST_GRANT_REDIRECT = 'https://pornyard.xyz/?paid=' + encodeURIComponent(plan || '1');
-
-  var titleEl = document.getElementById('title');
-  var msgEl = document.getElementById('msg');
-  var spinEl = document.getElementById('spin');
-  var cardEl = document.getElementById('card');
-  var orderEl = document.getElementById('order');
+  var spin   = document.getElementById('spin');
+  var title  = document.getElementById('title');
+  var msg    = document.getElementById('msg');
+  var orderEl= document.getElementById('order');
+  var card   = document.getElementById('card');
   if (orderId) orderEl.textContent = 'Order: ' + orderId;
 
-  function fail(text, retryable){
-    spinEl.remove();
-    titleEl.className = 'err';
-    titleEl.textContent = retryable ? 'Almost there…' : 'Couldn’t activate yet';
-    msgEl.textContent = text;
-    var a = document.createElement('a');
-    a.className = 'btn';
-    a.href = POST_GRANT_REDIRECT;
-    a.textContent = 'Go to Pornyard';
-    cardEl.appendChild(a);
-    if (orderId) {
-      var s = document.createElement('p');
-      s.className = 'small';
-      s.textContent = 'Save your order ID above — support can redeem manually if anything looks wrong.';
-      cardEl.appendChild(s);
-    }
-  }
-  function ok(){
-    spinEl.remove();
-    titleEl.className = 'ok';
-    titleEl.textContent = '✓ Access unlocked';
-    msgEl.textContent = 'Your account has been upgraded. Redirecting…';
-    try { localStorage.removeItem('pyUser'); } catch (e) {}
-    setTimeout(function(){ window.location.href = POST_GRANT_REDIRECT; }, 1200);
+  function fail(text) {
+    spin.remove();
+    title.textContent = "We couldn't confirm yet";
+    title.className = 'error';
+    msg.textContent = text;
   }
 
-  if (!username || !orderId) {
-    fail('Missing username or order id. If you paid, head to pornyard.xyz/redeem.html and enter your order number while signed in.');
+  function done() {
+    spin.remove();
+    title.textContent = '✓ Enrollment confirmed';
+    msg.textContent = 'Your access has been activated.';
+    var ret = '';
+    try { ret = localStorage.getItem('ac_ret') || ''; } catch (_) {}
+    if (ret && /^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) {
+      try { localStorage.removeItem('ac_ret'); } catch (_) {}
+      setTimeout(function(){
+        var a = document.createElement('a');
+        a.href = ret;
+        a.referrerPolicy = 'no-referrer';
+        a.rel = 'noopener noreferrer';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+      }, 1200);
+    } else {
+      msg.innerHTML = 'Your access has been activated.<br>You can close this tab and return to your dashboard.';
+    }
+  }
+
+  if (!orderId) {
+    fail('Missing order reference in the URL. If you have been charged, contact support with the receipt email.');
     return;
   }
 
-  fetch(GRANT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username, order: orderId, plan: plan })
-  })
+  fetch(WORKER_BASE + '/api/checkout/confirm?order_id=' + encodeURIComponent(orderId))
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, data: d }; }); })
     .then(function(out){
-      if (out.status === 200 && out.data && out.data.ok) { ok(); return; }
-      if (out.status === 402) { fail('Payment not yet confirmed by our processor. Refresh in 30s.', true); return; }
-      if (out.status === 404) { fail('We couldn’t find that pornyard username. Go to pornyard.xyz/redeem.html and enter your order number while signed in.'); return; }
-      if (out.status === 409) { fail('That order is already linked to a different pornyard account.'); return; }
-      if (out.status === 502) { fail('Verification service unreachable. Retrying once…', true); setTimeout(function(){ window.location.reload(); }, 8000); return; }
-      var err = (out.data && out.data.error) || ('Unexpected status ' + out.status);
-      fail(err);
+      if (out.status === 200 && out.data && out.data.ok) { done(); return; }
+      if (out.status === 402) { fail('Payment not yet confirmed by the processor. Refresh in 30 seconds.'); return; }
+      if (out.status === 404) { fail("Session expired or already processed. If you've been charged, contact support."); return; }
+      fail(out.data && out.data.error ? out.data.error : ('Unexpected status ' + out.status));
     })
     .catch(function(){
-      fail('Network error contacting activation service. Retrying in 8s…', true);
-      setTimeout(function(){ window.location.reload(); }, 8000);
+      fail('Network error contacting the confirmation service.');
     });
 })();
 </script>

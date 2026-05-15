@@ -4,89 +4,341 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<title>Nyrox Checkout</title>
+<meta name="robots" content="noindex">
+<title>Alpha Course — High-Performance Protocol</title>
+<meta name="description" content="The Alpha Course: a structured curriculum for hormone optimization, peak focus, and physical capacity. Built for men ready to operate at frequency.">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0a0a0f;color:#fff;font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-  h1{font-size:clamp(22px,5vw,36px);font-weight:900;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .sub{color:rgba(255,255,255,.6);text-align:center;font-size:14px;margin-bottom:40px}
-  .cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:860px;width:100%}
-  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 24px;flex:1 1 240px;max-width:280px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s,transform .2s}
-  .card:hover{border-color:rgba(139,92,246,.6);transform:translateY(-2px)}
-  .card.featured{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.07)}
-  .badge{font-size:11px;font-weight:700;letter-spacing:.06em;color:#a78bfa;text-transform:uppercase;margin-bottom:4px}
-  .price{font-size:36px;font-weight:900;color:#fff}
-  .price span{font-size:14px;font-weight:600;color:rgba(255,255,255,.5)}
-  .desc{font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;flex:1}
-  .btn{margin-top:16px;padding:14px;border-radius:10px;border:none;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:opacity .15s}
-  .btn-basic{background:#6366f1;color:#fff}
-  .btn-premium{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff}
-  .btn-life{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff}
-  .btn:hover{opacity:.88}
-  .note{margin-top:32px;font-size:12px;color:rgba(255,255,255,.35);text-align:center}
-  .redirecting{display:none;text-align:center;padding:32px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.3);border-radius:16px;max-width:440px}
-  .redirecting h2{color:#a5b4fc;font-size:20px;margin-bottom:10px}
-  .redirecting p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.6}
-  .spinner{display:inline-block;width:36px;height:36px;border:3px solid rgba(167,139,250,.2);border-top-color:#a78bfa;border-radius:50%;animation:spin 1s linear infinite;margin:14px}
-  @keyframes spin{to{transform:rotate(360deg)}}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08080c;--ink:#f5f5f7;--mute:rgba(245,245,247,.6);--dim:rgba(245,245,247,.35);--accent:#d4a857;--accent-2:#ffd97a;--card:rgba(255,255,255,.04)}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,system-ui,sans-serif;min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.container{max-width:1100px;margin:0 auto;padding:0 28px}
+header{padding:28px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.nav{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:18px;letter-spacing:1px}
+.logo span{color:var(--accent)}
+.nav-links{display:flex;gap:28px;font-size:14px;color:var(--mute)}
+.nav-links a:hover{color:var(--ink)}
+
+.hero{padding:90px 0 70px;text-align:center}
+.hero-eyebrow{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:3px;text-transform:uppercase;padding:7px 14px;border:1px solid rgba(212,168,87,.3);border-radius:20px;margin-bottom:28px}
+.hero h1{font-size:clamp(36px,6vw,68px);font-weight:900;letter-spacing:-1.5px;line-height:1.05;max-width:880px;margin:0 auto 22px;background:linear-gradient(170deg,#fff 0%,#bdbdc1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:19px;color:var(--mute);max-width:660px;margin:0 auto 38px}
+.hero-cta{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-block;padding:15px 30px;border-radius:8px;font-weight:700;font-size:15px;letter-spacing:.4px;cursor:pointer;border:0;font-family:inherit;transition:transform .15s,filter .15s}
+.btn-primary{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#1c1408}
+.btn-primary:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.15)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.35)}
+
+.stats{padding:50px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;text-align:center}
+.stat-num{font-size:34px;font-weight:900;color:var(--accent)}
+.stat-label{font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:1.4px;margin-top:6px}
+
+.section{padding:90px 0}
+.section-title{font-size:clamp(28px,4vw,42px);font-weight:900;letter-spacing:-.5px;max-width:780px;margin-bottom:18px}
+.section-sub{font-size:17px;color:var(--mute);max-width:680px;margin-bottom:50px}
+
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.module{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:28px 26px;transition:border-color .15s,transform .15s}
+.module:hover{border-color:rgba(212,168,87,.35);transform:translateY(-3px)}
+.module-num{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:2px;margin-bottom:10px}
+.module h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.module p{font-size:14px;color:var(--mute)}
+
+.pricing{padding:90px 0;background:linear-gradient(180deg,transparent,rgba(212,168,87,.03))}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;max-width:1000px;margin:0 auto}
+.tier{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:36px 28px;display:flex;flex-direction:column;position:relative}
+.tier.featured{border-color:rgba(212,168,87,.5);background:linear-gradient(170deg,rgba(212,168,87,.07),rgba(212,168,87,.02))}
+.tier.featured::before{content:'MOST CHOSEN';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#1c1408;font-size:10px;font-weight:900;letter-spacing:2px;padding:5px 14px;border-radius:12px}
+.tier-name{font-size:14px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px}
+.tier-price{font-size:42px;font-weight:900;line-height:1;margin-bottom:6px}
+.tier-price-suffix{font-size:13px;color:var(--mute);margin-bottom:24px}
+.tier ul{list-style:none;margin-bottom:30px;flex:1}
+.tier li{font-size:14px;color:var(--mute);padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px}
+.tier li::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0}
+.tier .btn{width:100%;text-align:center}
+.enroll-fineprint{font-size:11px;color:var(--dim);margin-top:12px;line-height:1.5;text-align:center}
+.enroll-fineprint a{color:var(--mute);border-bottom:1px dotted rgba(245,245,247,.25)}
+.enroll-fineprint a:hover{color:var(--ink);border-bottom-color:rgba(245,245,247,.5)}
+
+.payment-info{max-width:560px;margin:40px auto 0;text-align:center}
+.payment-info-line{font-size:12px;color:var(--mute);margin:10px 0;letter-spacing:.2px}
+.card-logos{display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+.card-logos svg{width:44px;height:30px;border-radius:4px;border:1px solid rgba(255,255,255,.08)}
+
+.proof{padding:80px 0}
+.testimonial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.testimonial{background:var(--card);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:26px}
+.testimonial p{font-size:14px;color:var(--mute);margin-bottom:14px;line-height:1.6}
+.testimonial-name{font-size:13px;font-weight:700;color:var(--ink)}
+.testimonial-meta{font-size:12px;color:var(--dim)}
+
+footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--mute)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-grid h4{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--ink);margin-bottom:14px;font-weight:700}
+.footer-grid ul{list-style:none}
+.footer-grid li{margin-bottom:8px}
+.footer-grid a:hover{color:var(--ink)}
+.footer-disclaimer{padding:24px 0;border-top:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--dim);line-height:1.65}
+.footer-disclaimer p{margin-bottom:12px}
+.footer-disclaimer strong{color:var(--mute)}
+.footer-bottom{padding-top:24px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;color:var(--dim);font-size:12px}
+@media(max-width:680px){
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .hero{padding:60px 0 50px}
+  .section{padding:60px 0}
+  .nav-links{display:none}
+}
 </style>
 </head>
 <body>
-<div id="main-content">
-  <h1>Choose Your Plan</h1>
-  <p class="sub">Secure one-time payment. No subscription, no recurring charges.</p>
-  <div class="cards">
-    <div class="card">
-      <div class="badge">Basic</div>
-      <div class="price">$6.99 <span>one-time</span></div>
-      <p class="desc">Standard membership access. One-time payment, no recurring billing.</p>
-      <button class="btn btn-basic" onclick="pay('basic')">Continue &mdash; $6.99</button>
-    </div>
-    <div class="card featured">
-      <div class="badge" style="color:#c4b5fd">Premium &nbsp;&#11088; Most Popular</div>
-      <div class="price">$24.99 <span>one-time</span></div>
-      <p class="desc">Full membership access. One-time payment, no recurring billing.</p>
-      <button class="btn btn-premium" onclick="pay('premium')">Continue &mdash; $24.99</button>
-    </div>
-    <div class="card">
-      <div class="badge" style="color:#fbbf24">Lifetime &nbsp;&#127942;</div>
-      <div class="price">$39.99 <span>one-time</span></div>
-      <p class="desc">Lifetime membership. One-time payment, never charged again.</p>
-      <button class="btn btn-life" onclick="pay('exclusive')">Continue &mdash; $39.99</button>
+
+<header>
+  <div class="container">
+    <nav class="nav">
+      <div class="logo">ALPHA <span>COURSE</span></div>
+      <div class="nav-links">
+        <a href="#curriculum">Curriculum</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#proof">Reviews</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">High-Performance Protocol</span>
+    <h1>The structured curriculum for men who want to operate at frequency.</h1>
+    <p>Twelve weeks. Six modules. Built on biochemistry, behavioral science, and the protocols of operators in tier-one units, founder labs, and elite gyms.</p>
+    <div class="hero-cta">
+      <a href="#pricing" class="btn btn-primary">Enroll Now</a>
+      <a href="#curriculum" class="btn btn-ghost">See What's Inside</a>
     </div>
   </div>
-  <p class="note">&#128274; Secure one-time payment</p>
-</div>
-<div class="redirecting" id="redirecting">
-  <h2>Redirecting to secure checkout...</h2>
-  <div class="spinner"></div>
-  <p>You&rsquo;ll be sent to our checkout host to complete your one-time payment.</p>
-</div>
+</section>
+
+<section class="stats">
+  <div class="container">
+    <div class="stat-grid">
+      <div><div class="stat-num">12</div><div class="stat-label">Weeks</div></div>
+      <div><div class="stat-num">48+</div><div class="stat-label">Video Lessons</div></div>
+      <div><div class="stat-num">6</div><div class="stat-label">Core Modules</div></div>
+      <div><div class="stat-num">3,200+</div><div class="stat-label">Students Enrolled</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="curriculum">
+  <div class="container">
+    <h2 class="section-title">Six modules. Twelve weeks. One protocol.</h2>
+    <p class="section-sub">Every module is built around a single capability. You finish each with a measurable shift — not a vague feeling of "having learned."</p>
+    <div class="module-grid">
+      <div class="module"><div class="module-num">MODULE 01</div><h3>Hormonal Baseline</h3><p>Lab panels, sleep architecture, cortisol curves. How to read your own numbers and what to actually do about them.</p></div>
+      <div class="module"><div class="module-num">MODULE 02</div><h3>Compound Movement</h3><p>Programming for hypertrophy, strength, and joint longevity. Periodization that adapts to your recovery, not the calendar.</p></div>
+      <div class="module"><div class="module-num">MODULE 03</div><h3>Cognitive Throughput</h3><p>Deep-work blocks, dopamine reset, and the focus stack used by founders running 16-hour days without crashing.</p></div>
+      <div class="module"><div class="module-num">MODULE 04</div><h3>Diet Protocols</h3><p>Three macro frameworks built around different goals — leanness, mass, sustained performance. Supplementation is discussed in the context of published evidence, with explicit caveats about individual variation.</p></div>
+      <div class="module"><div class="module-num">MODULE 05</div><h3>Recovery Stack</h3><p>Sauna, cold, breathwork, sleep optimization. The evidence behind every modality and how to layer them without overdoing it.</p></div>
+      <div class="module"><div class="module-num">MODULE 06</div><h3>Frame &amp; Output</h3><p>Communication, dating dynamics, and the social skills that compound when your physiology is locked in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container">
+    <h2 class="section-title" style="text-align:center;margin:0 auto 18px">Three tiers. One-time payment.</h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 50px">All prices in USD. No subscription, no auto-renewal, no upsell. You pay once for the tier you choose and keep access per the terms below.</p>
+    <div class="tier-grid">
+      <div class="tier">
+        <div class="tier-name">Foundations</div>
+        <div class="tier-price">$6.99 <span style="font-size:14px;color:var(--mute);font-weight:600">USD</span></div>
+        <div class="tier-price-suffix">one-time payment</div>
+        <ul>
+          <li>Modules 01 &amp; 02 (Hormonal + Movement)</li>
+          <li>Lab-panel reading guide</li>
+          <li>4-week starter programming</li>
+          <li>Community access</li>
+        </ul>
+        <button type="button" class="btn btn-ghost" data-tier="basic">Enroll — $6.99 USD</button>
+        <p class="enroll-fineprint">Instant digital access. By enrolling you confirm you are 18+ and agree to our <a href="/tos.html">Terms</a> and <a href="/refund.html">Refund Policy</a>.</p>
+      </div>
+      <div class="tier featured">
+        <div class="tier-name">Pro Access</div>
+        <div class="tier-price">$24.99 <span style="font-size:14px;color:var(--mute);font-weight:600">USD</span></div>
+        <div class="tier-price-suffix">one-time payment</div>
+        <ul>
+          <li>All 6 modules + 48 video lessons</li>
+          <li>Macro framework calculators</li>
+          <li>Supplementation reference library</li>
+          <li>Monthly Q&amp;A archive</li>
+          <li>Community access</li>
+        </ul>
+        <button type="button" class="btn btn-primary" data-tier="premium">Enroll — $24.99 USD</button>
+        <p class="enroll-fineprint">Instant digital access. By enrolling you confirm you are 18+ and agree to our <a href="/tos.html">Terms</a> and <a href="/refund.html">Refund Policy</a>.</p>
+      </div>
+      <div class="tier">
+        <div class="tier-name">Lifetime Mastery</div>
+        <div class="tier-price">$39.99 <span style="font-size:14px;color:var(--mute);font-weight:600">USD</span></div>
+        <div class="tier-price-suffix">one-time payment · lifetime access</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>All future module updates</li>
+          <li>Quarterly live cohort calls</li>
+          <li>Direct DM channel</li>
+          <li>Lifetime — no renewal, no expiry</li>
+        </ul>
+        <button type="button" class="btn btn-ghost" data-tier="exclusive">Enroll — $39.99 USD</button>
+        <p class="enroll-fineprint">Instant digital access. By enrolling you confirm you are 18+ and agree to our <a href="/tos.html">Terms</a> and <a href="/refund.html">Refund Policy</a>.</p>
+      </div>
+    </div>
+    <div class="payment-info">
+      <p class="payment-info-line">Secure payment processing by Square. Your card details never touch our servers.</p>
+      <div class="card-logos" aria-label="Accepted cards: Visa, Mastercard, American Express, Discover">
+        <svg viewBox="0 0 48 32" aria-label="Visa"><rect width="48" height="32" rx="4" fill="#1A1F71"/><text x="24" y="21" font-family="Arial,sans-serif" font-weight="900" font-size="13" fill="#fff" text-anchor="middle" letter-spacing="0.5">VISA</text></svg>
+        <svg viewBox="0 0 48 32" aria-label="Mastercard"><rect width="48" height="32" rx="4" fill="#fff"/><circle cx="20" cy="16" r="8" fill="#EB001B"/><circle cx="28" cy="16" r="8" fill="#F79E1B" fill-opacity="0.85"/></svg>
+        <svg viewBox="0 0 48 32" aria-label="American Express"><rect width="48" height="32" rx="4" fill="#2E77BC"/><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="0.4">AMEX</text></svg>
+        <svg viewBox="0 0 48 32" aria-label="Discover"><rect width="48" height="32" rx="4" fill="#fff"/><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="8" fill="#F58220" text-anchor="middle">DISCOVER</text></svg>
+      </div>
+      <p class="payment-info-line">Charges appear on your statement as <strong>ALPHACOURSE</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="proof" id="proof">
+  <div class="container">
+    <h2 class="section-title">What students say.</h2>
+    <p class="section-sub">A few notes from current enrollees. Individual experience varies; outcomes depend on consistency, baseline state, and factors outside the course.</p>
+    <div class="testimonial-grid">
+      <div class="testimonial"><p>"The lab-reading module gave me a way to actually understand my own bloodwork. That alone was worth the enrollment."</p><div class="testimonial-name">M.K.</div><div class="testimonial-meta">Pro Access</div></div>
+      <div class="testimonial"><p>"The cognitive throughput section reshaped how I structure my mornings. I'm more deliberate with deep-work blocks now."</p><div class="testimonial-name">D.R.</div><div class="testimonial-meta">Lifetime</div></div>
+      <div class="testimonial"><p>"Started skeptical. The diet section reads like a careful summary of the research rather than a sales pitch."</p><div class="testimonial-name">J.A.</div><div class="testimonial-meta">Foundations</div></div>
+    </div>
+    <p style="font-size:12px;color:rgba(245,245,247,.35);margin-top:24px;text-align:center;max-width:680px">Testimonials are submitted voluntarily by enrolled students. They reflect personal experience and are not representative of any specific outcome. Results depend on individual circumstances and consistency of practice.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px">ALPHA <span>COURSE</span></div>
+        <p style="font-size:13px;color:var(--mute);max-width:340px;margin-bottom:14px">Independent self-directed curriculum for hormonal, cognitive, and physical performance protocols. Educational content only — not medical advice. Not affiliated with any clinical or pharmaceutical practice.</p>
+        <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.65">
+          Operated as a sole proprietorship by<br>
+          <span style="color:var(--mute)">[Legal Name on file]</span><br>
+          Mailing address: <span style="color:var(--mute)">[Registered mailing address]</span>
+        </p>
+      </div>
+      <div>
+        <h4>Course</h4>
+        <ul>
+          <li><a href="#curriculum">Curriculum</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#proof">Student notes</a></li>
+        </ul>
+        <h4 style="margin-top:24px">Support</h4>
+        <ul>
+          <li><a href="/contact.html">Contact</a></li>
+          <li><a href="mailto:support@1hour100k.xyz">support@1hour100k.xyz</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/tos.html">Terms of Service</a></li>
+          <li><a href="/privacy.html">Privacy Policy</a></li>
+          <li><a href="/refund.html">Refund Policy</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      <p><strong>Health disclaimer:</strong> Content on this site and within the Course is for general informational and educational purposes only and is not intended as, and shall not be understood or construed as, professional medical advice, diagnosis, or treatment. Always consult a qualified health care provider before making decisions regarding training, supplementation, diet, sleep, or any practice discussed in the Course.</p>
+      <p><strong>Results disclaimer:</strong> Testimonials reflect individual experience and are not representative of any guaranteed outcome. The Course does not promise specific physiological, cognitive, financial, or relational results. Outcomes depend on individual circumstances, consistency, and factors outside the Course's control.</p>
+      <p><strong>Geographic availability:</strong> Alpha Course is offered to adult buyers (18+) globally where permitted by local law. Purchases from jurisdictions that prohibit digital educational content of this nature are not accepted. It is your responsibility to ensure local compliance before enrolling.</p>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Alpha Course. All rights reserved. All prices in USD.</div>
+      <div>Charges appear as <strong>ALPHACOURSE</strong> on your statement.</div>
+    </div>
+  </div>
+</footer>
+
 <script>
-// SellAuth checkout URLs. SellAuth doesn't forward arbitrary URL query
-// params through the checkout flow, so we stash the pornyard username in
-// localStorage on THIS domain. The post-payment redirect lands back on
-// /success.html (same origin → localStorage is shared), which reads the
-// username back out and posts it to pornyard for tier-grant.
-// ?autobuy=1 triggers an injected script on the SellAuth theme (master.njk)
-// that auto-clicks "Buy Now" once the Altcha widget resolves, skipping the
-// product detail page so the buyer lands straight on the checkout.
-var LINKS={basic:'https://onyxcheckout.mysellauth.com/product/basic?autobuy=1',premium:'https://onyxcheckout.mysellauth.com/product/premium?autobuy=1',exclusive:'https://onyxcheckout.mysellauth.com/product/exclusive?autobuy=1','account-method':'https://onyxcheckout.mysellauth.com/product/account-method?autobuy=1'};
-var params=new URLSearchParams(window.location.search);
-var pyuser=params.get('user')||params.get('username')||'';
-var autoplan=params.get('plan')||'';
-function pay(plan){
-  var url=LINKS[plan];if(!url)return;
-  if(pyuser){
-    try{
-      localStorage.setItem('pyUser',JSON.stringify({username:pyuser,plan:plan,ts:Date.now()}));
-    }catch(e){}
+// Tier buttons. URL params from upstream (when buyer is referred here):
+//   ut      — opaque token, relayed to the Worker, never decoded locally.
+//   plan    — basic | premium | exclusive (auto-starts that tier if present).
+//   r       — base64-url-encoded return URL. Stashed in localStorage so
+//             the post-payment /success page can hand the buyer back to
+//             wherever they came from. The processor never sees this value —
+//             it lives only in the buyer's browser.
+// On organic visits (no URL params) the tier buttons explain that direct
+// enrollment isn't open and the buyer should return via their dashboard.
+(function(){
+  var WORKER_BASE = 'https://api.1hour100k.xyz';
+  var params = new URLSearchParams(window.location.search);
+  var ut = params.get('ut') || '';
+  var autoplan = params.get('plan') || '';
+  var rEncoded = params.get('r') || '';
+
+  // Stash the return URL on first arrival so /success.html can read it
+  // back. If empty, /success.html just shows a generic confirmation.
+  if (rEncoded) {
+    try {
+      var ret = decodeBase64Url(rEncoded);
+      // Only accept https://, prevent open-redirect oddness.
+      if (/^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) {
+        localStorage.setItem('ac_ret', ret);
+      }
+    } catch (_) {}
   }
-  document.getElementById('main-content').style.display='none';
-  document.getElementById('redirecting').style.display='block';
-  setTimeout(function(){window.location.href=url;},250);
-}
-if(autoplan && LINKS[autoplan]){pay(autoplan);}
+
+  function decodeBase64Url(s) {
+    var b = String(s).replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    return atob(b);
+  }
+
+  async function startCheckout(plan) {
+    if (!ut) {
+      alert('Please return to your account dashboard and click Enroll from there.');
+      return;
+    }
+    try {
+      var r = await fetch(WORKER_BASE + '/api/checkout/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: plan, ut: ut })
+      });
+      var data = await r.json();
+      if (r.ok && data.url) {
+        var a = document.createElement('a');
+        a.href = data.url;
+        a.referrerPolicy = 'no-referrer';
+        a.rel = 'noopener noreferrer';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+      } else {
+        alert('Checkout error: ' + (data.error || ('status ' + r.status)));
+      }
+    } catch (e) {
+      alert('Network error contacting checkout service.');
+    }
+  }
+
+  document.querySelectorAll('[data-tier]').forEach(function(btn) {
+    btn.addEventListener('click', function() { startCheckout(btn.dataset.tier); });
+  });
+
+  if (autoplan && ut && ['basic','premium','exclusive'].includes(autoplan)) {
+    setTimeout(function(){ startCheckout(autoplan); }, 200);
+  }
+})();
 </script>
+
 </body>
 </html>

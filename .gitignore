@@ -1,0 +1,9 @@
+# The Worker is deployed via `wrangler deploy`, NOT via git push to GitHub
+# Pages. Keep it out of the static-site repo so audit tooling and Worker
+# source never get served publicly from 1hour100k.xyz.
+worker/
+
+# Local
+.DS_Store
+node_modules/
+.wrangler/

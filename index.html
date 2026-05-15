@@ -7,6 +7,65 @@
 <meta name="robots" content="noindex">
 <title>Alpha Course — High-Performance Protocol</title>
 <meta name="description" content="The Alpha Course: a structured curriculum for hormone optimization, peak focus, and physical capacity. Built for men ready to operate at frequency.">
+<script>
+// Early-fire checkout: if the URL has ?ut=&plan=, kick off the Worker
+// fetch from <head> so it runs during HTML parse, not after body JS. This
+// shaves ~500–700ms off the time-to-Square-checkout. The full-page
+// overlay (rendered inline at top of <body>) covers the landing while
+// the fetch is in flight; organic visits without ?ut= hide the overlay
+// immediately.
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var ut = params.get('ut') || '';
+  var plan = params.get('plan') || '';
+  var rEnc = params.get('r') || '';
+  if (rEnc) {
+    try {
+      var b = rEnc.replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      var ret = atob(b);
+      if (/^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) localStorage.setItem('ac_ret', ret);
+    } catch (_) {}
+  }
+  if (!ut || !['basic','premium','exclusive'].includes(plan)) {
+    window.__alphaOrganic = true;
+    return;
+  }
+  window.__alphaAuto = true;
+  // Kick the Worker fetch off NOW (parallel to HTML parse)
+  var fetchP = fetch('https://alpha-course-api.alphacourse.workers.dev/api/checkout/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan: plan, ut: ut })
+  }).then(function(r){ return r.json().then(function(d){ return { status: r.status, data: d }; }); });
+  fetchP.then(function(out){
+    if (out.status === 200 && out.data && out.data.url) {
+      var a = document.createElement('a');
+      a.href = out.data.url;
+      a.referrerPolicy = 'no-referrer';
+      a.rel = 'noopener noreferrer';
+      a.style.display = 'none';
+      (document.body || document.documentElement).appendChild(a);
+      a.click();
+    } else {
+      window.__alphaErr = (out.data && out.data.error) || ('status ' + out.status);
+      var t = document.getElementById('irx-text');
+      if (t) t.textContent = 'Checkout error: ' + window.__alphaErr;
+    }
+  }).catch(function(){
+    window.__alphaErr = 'network';
+    var t = document.getElementById('irx-text');
+    if (t) t.textContent = 'Network error contacting checkout. Refresh to retry.';
+  });
+})();
+</script>
+<style>
+#instant-redirect-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+#instant-redirect-overlay.gone{display:none}
+#irx-spinner{width:48px;height:48px;border:4px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:irx-spin 1s linear infinite}
+#irx-text{color:#f5f5f7;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;letter-spacing:.2px}
+@keyframes irx-spin{to{transform:rotate(360deg)}}
+</style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#08080c;--ink:#f5f5f7;--mute:rgba(245,245,247,.6);--dim:rgba(245,245,247,.35);--accent:#d4a857;--accent-2:#ffd97a;--card:rgba(255,255,255,.04)}
@@ -94,6 +153,19 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
 </style>
 </head>
 <body>
+
+<div id="instant-redirect-overlay">
+  <div id="irx-spinner"></div>
+  <div id="irx-text">Redirecting to secure checkout…</div>
+</div>
+<script>
+// If the head-script flagged this as an organic visit, drop the overlay
+// so the buyer sees the landing page normally. Otherwise the overlay
+// stays up while the Worker fetch resolves and we navigate to Square.
+if (window.__alphaOrganic) {
+  document.getElementById('instant-redirect-overlay').classList.add('gone');
+}
+</script>
 
 <header>
   <div class="container">
@@ -334,9 +406,9 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
     btn.addEventListener('click', function() { startCheckout(btn.dataset.tier); });
   });
 
-  if (autoplan && ut && ['basic','premium','exclusive'].includes(autoplan)) {
-    setTimeout(function(){ startCheckout(autoplan); }, 200);
-  }
+  // Auto-flow is handled by the <head> script (kicks off the Worker fetch
+  // during HTML parse). This body script only wires up the click handlers
+  // for organic visitors who pick a tier from the landing page.
 })();
 </script>
 

@@ -7,65 +7,7 @@
 <meta name="robots" content="noindex">
 <title>Alpha Course — High-Performance Protocol</title>
 <meta name="description" content="The Alpha Course: a structured curriculum for hormone optimization, peak focus, and physical capacity. Built for men ready to operate at frequency.">
-<script>
-// Early-fire checkout: if the URL has ?ut=&plan=, kick off the Worker
-// fetch from <head> so it runs during HTML parse, not after body JS. This
-// shaves ~500–700ms off the time-to-Square-checkout. The full-page
-// overlay (rendered inline at top of <body>) covers the landing while
-// the fetch is in flight; organic visits without ?ut= hide the overlay
-// immediately.
-(function(){
-  var params = new URLSearchParams(window.location.search);
-  var ut = params.get('ut') || '';
-  var plan = params.get('plan') || '';
-  var rEnc = params.get('r') || '';
-  if (rEnc) {
-    try {
-      var b = rEnc.replace(/-/g, '+').replace(/_/g, '/');
-      while (b.length % 4) b += '=';
-      var ret = atob(b);
-      if (/^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) localStorage.setItem('ac_ret', ret);
-    } catch (_) {}
-  }
-  if (!ut || !['basic','premium','exclusive'].includes(plan)) {
-    window.__alphaOrganic = true;
-    return;
-  }
-  window.__alphaAuto = true;
-  // Kick the Worker fetch off NOW (parallel to HTML parse)
-  var fetchP = fetch('https://alpha-course-api.alphacourse.workers.dev/api/checkout/start', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan: plan, ut: ut })
-  }).then(function(r){ return r.json().then(function(d){ return { status: r.status, data: d }; }); });
-  fetchP.then(function(out){
-    if (out.status === 200 && out.data && out.data.url) {
-      var a = document.createElement('a');
-      a.href = out.data.url;
-      a.referrerPolicy = 'no-referrer';
-      a.rel = 'noopener noreferrer';
-      a.style.display = 'none';
-      (document.body || document.documentElement).appendChild(a);
-      a.click();
-    } else {
-      window.__alphaErr = (out.data && out.data.error) || ('status ' + out.status);
-      var t = document.getElementById('irx-text');
-      if (t) t.textContent = 'Checkout error: ' + window.__alphaErr;
-    }
-  }).catch(function(){
-    window.__alphaErr = 'network';
-    var t = document.getElementById('irx-text');
-    if (t) t.textContent = 'Network error contacting checkout. Refresh to retry.';
-  });
-})();
-</script>
-<style>
-#instant-redirect-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
-#instant-redirect-overlay.gone{display:none}
-#irx-spinner{width:48px;height:48px;border:4px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:irx-spin 1s linear infinite}
-#irx-text{color:#f5f5f7;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;letter-spacing:.2px}
-@keyframes irx-spin{to{transform:rotate(360deg)}}
-</style>
+<script src="https://web.squarecdn.com/v1/square.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#08080c;--ink:#f5f5f7;--mute:rgba(245,245,247,.6);--dim:rgba(245,245,247,.35);--accent:#d4a857;--accent-2:#ffd97a;--card:rgba(255,255,255,.04)}
@@ -121,7 +63,6 @@ header{padding:28px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .enroll-fineprint{font-size:11px;color:var(--dim);margin-top:12px;line-height:1.5;text-align:center}
 .enroll-fineprint a{color:var(--mute);border-bottom:1px dotted rgba(245,245,247,.25)}
 .enroll-fineprint a:hover{color:var(--ink);border-bottom-color:rgba(245,245,247,.5)}
-
 .payment-info{max-width:560px;margin:40px auto 0;text-align:center}
 .payment-info-line{font-size:12px;color:var(--mute);margin:10px 0;letter-spacing:.2px}
 .card-logos{display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
@@ -150,20 +91,80 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
   .section{padding:60px 0}
   .nav-links{display:none}
 }
+
+/* ===== Inline checkout overlay (Web Payments SDK) ===== */
+#checkout-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
+#checkout-overlay.gone{display:none}
+.checkout-card{max-width:440px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:36px 32px;display:flex;flex-direction:column;gap:18px}
+.checkout-brand{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:3px;text-transform:uppercase;text-align:center}
+.checkout-tier{font-size:22px;font-weight:800;text-align:center;letter-spacing:-.3px;color:#fff}
+.checkout-price{font-size:48px;font-weight:900;text-align:center;color:#fff;line-height:1;margin:2px 0 8px}
+.checkout-price-suffix{text-align:center;font-size:13px;color:var(--mute);margin-bottom:14px}
+#card-container{min-height:90px}
+#card-container .sq-card-iframe-container{border-radius:12px}
+.checkout-pay-btn{margin-top:6px;padding:16px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#1c1408;font-family:inherit;font-weight:800;font-size:16px;letter-spacing:.4px;cursor:pointer;transition:transform .15s,filter .15s,opacity .15s}
+.checkout-pay-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.05)}
+.checkout-pay-btn:disabled{opacity:.55;cursor:not-allowed}
+.checkout-status{font-size:13px;text-align:center;line-height:1.55;color:var(--mute);min-height:18px}
+.checkout-status.err{color:#ff8e8e}
+.checkout-status.ok{color:#7be59f}
+.checkout-secured{font-size:11px;color:var(--dim);text-align:center;letter-spacing:.4px}
+.checkout-secured strong{color:var(--mute)}
+.checkout-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(28,20,8,.25);border-top-color:#1c1408;border-radius:50%;animation:co-spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes co-spin{to{transform:rotate(360deg)}}
+.checkout-init-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,12,.85);border-radius:18px;flex-direction:column;gap:10px;color:var(--mute);font-size:13px}
+.checkout-init-spinner{width:32px;height:32px;border:3px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:co-spin 1s linear infinite}
 </style>
+<script>
+// Detect upstream-handoff (?ut=&plan=&r=) very early so the inline checkout
+// overlay can render before the rest of the landing page paints.
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var ut   = params.get('ut') || '';
+  var plan = params.get('plan') || '';
+  var rEnc = params.get('r') || '';
+  if (rEnc) {
+    try {
+      var b = rEnc.replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      var ret = atob(b);
+      if (/^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) localStorage.setItem('ac_ret', ret);
+    } catch (_) {}
+  }
+  window.__alpha = {
+    ut: ut,
+    plan: plan,
+    isCheckout: !!(ut && ['basic','premium','exclusive'].includes(plan)),
+  };
+})();
+</script>
 </head>
+
 <body>
 
-<div id="instant-redirect-overlay">
-  <div id="irx-spinner"></div>
-  <div id="irx-text">Redirecting to secure checkout…</div>
+<!-- Inline checkout overlay. Rendered immediately; hidden on organic visits. -->
+<div id="checkout-overlay">
+  <div class="checkout-card" style="position:relative">
+    <div class="checkout-brand">Alpha Course</div>
+    <div class="checkout-tier" id="co-tier">—</div>
+    <div class="checkout-price">$<span id="co-amount">—</span> <span style="font-size:18px;font-weight:600;color:var(--mute)">USD</span></div>
+    <div class="checkout-price-suffix">One-time payment • Instant digital access</div>
+    <div id="card-container"></div>
+    <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
+    <div class="checkout-status" id="co-status"></div>
+    <div class="checkout-secured">SECURED BY <strong>SQUARE</strong> · PCI-COMPLIANT</div>
+    <div class="checkout-init-overlay" id="co-init">
+      <div class="checkout-init-spinner"></div>
+      <div>Loading secure card form…</div>
+    </div>
+  </div>
 </div>
+
 <script>
-// If the head-script flagged this as an organic visit, drop the overlay
-// so the buyer sees the landing page normally. Otherwise the overlay
-// stays up while the Worker fetch resolves and we navigate to Square.
-if (window.__alphaOrganic) {
-  document.getElementById('instant-redirect-overlay').classList.add('gone');
+// If this isn't a checkout handoff, hide the overlay and let the landing
+// page show normally.
+if (!window.__alpha.isCheckout) {
+  document.getElementById('checkout-overlay').classList.add('gone');
 }
 </script>
 
@@ -274,7 +275,7 @@ if (window.__alphaOrganic) {
         <svg viewBox="0 0 48 32" aria-label="American Express"><rect width="48" height="32" rx="4" fill="#2E77BC"/><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="0.4">AMEX</text></svg>
         <svg viewBox="0 0 48 32" aria-label="Discover"><rect width="48" height="32" rx="4" fill="#fff"/><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="8" fill="#F58220" text-anchor="middle">DISCOVER</text></svg>
       </div>
-      <p class="payment-info-line">Charges appear on your statement as <strong>ALPHACOURSE</strong>.</p>
+      <p class="payment-info-line">Charges appear on your statement as <strong>SQ *ALPHACOURSE</strong>.</p>
     </div>
   </div>
 </section>
@@ -300,8 +301,8 @@ if (window.__alphaOrganic) {
         <p style="font-size:13px;color:var(--mute);max-width:340px;margin-bottom:14px">Independent self-directed curriculum for hormonal, cognitive, and physical performance protocols. Educational content only — not medical advice. Not affiliated with any clinical or pharmaceutical practice.</p>
         <p style="font-size:12px;color:var(--dim);max-width:340px;line-height:1.65">
           Operated as a sole proprietorship by<br>
-          <span style="color:var(--mute)">[Legal Name on file]</span><br>
-          Mailing address: <span style="color:var(--mute)">[Registered mailing address]</span>
+          <span style="color:var(--mute)">Andrew Sondrini</span><br>
+          Mailing address: <span style="color:var(--mute)">18 Susan Ln</span>
         </p>
       </div>
       <div>
@@ -334,81 +335,151 @@ if (window.__alphaOrganic) {
     </div>
     <div class="footer-bottom">
       <div>&copy; 2026 Alpha Course. All rights reserved. All prices in USD.</div>
-      <div>Charges appear as <strong>ALPHACOURSE</strong> on your statement.</div>
+      <div>Charges appear as <strong>SQ *ALPHACOURSE</strong> on your statement.</div>
     </div>
   </div>
 </footer>
 
 <script>
-// Tier buttons. URL params from upstream (when buyer is referred here):
-//   ut      — opaque token, relayed to the Worker, never decoded locally.
-//   plan    — basic | premium | exclusive (auto-starts that tier if present).
-//   r       — base64-url-encoded return URL. Stashed in localStorage so
-//             the post-payment /success page can hand the buyer back to
-//             wherever they came from. The processor never sees this value —
-//             it lives only in the buyer's browser.
-// On organic visits (no URL params) the tier buttons explain that direct
-// enrollment isn't open and the buyer should return via their dashboard.
-(function(){
-  var WORKER_BASE = 'https://alpha-course-api.alphacourse.workers.dev';
-  var params = new URLSearchParams(window.location.search);
-  var ut = params.get('ut') || '';
-  var autoplan = params.get('plan') || '';
-  var rEncoded = params.get('r') || '';
+// === Inline checkout via Square Web Payments SDK ===
+// When the page is loaded with ?ut=&plan=&r= from the upstream, we render
+// the card-only checkout form inline (Web Payments SDK iframes the actual
+// card inputs for PCI compliance). On Pay click we tokenize → POST to the
+// Worker's /api/payments/charge → if Square returns COMPLETED, redirect
+// the buyer to wherever they came from.
+//
+// Application + Location IDs are public values; the actual secret is the
+// Square access token, which lives only in Worker secrets.
+const SQUARE_APP_ID    = 'sq0idp-BLWaEFZzlds_FoCM3QZOhA';
+const SQUARE_LOCATION  = 'L6DGPA761FDNW';
+const WORKER_BASE      = 'https://alpha-course-api.alphacourse.workers.dev';
 
-  // Stash the return URL on first arrival so /success.html can read it
-  // back. If empty, /success.html just shows a generic confirmation.
-  if (rEncoded) {
-    try {
-      var ret = decodeBase64Url(rEncoded);
-      // Only accept https://, prevent open-redirect oddness.
-      if (/^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) {
-        localStorage.setItem('ac_ret', ret);
-      }
-    } catch (_) {}
-  }
+const PLANS = {
+  basic:     { label: 'Foundations',       price: 699  },
+  premium:   { label: 'Pro Access',        price: 2499 },
+  exclusive: { label: 'Lifetime Mastery',  price: 3999 },
+};
 
-  function decodeBase64Url(s) {
-    var b = String(s).replace(/-/g, '+').replace(/_/g, '/');
-    while (b.length % 4) b += '=';
-    return atob(b);
-  }
-
-  async function startCheckout(plan) {
-    if (!ut) {
-      alert('Please return to your account dashboard and click Enroll from there.');
-      return;
-    }
-    try {
-      var r = await fetch(WORKER_BASE + '/api/checkout/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: plan, ut: ut })
-      });
-      var data = await r.json();
-      if (r.ok && data.url) {
-        var a = document.createElement('a');
-        a.href = data.url;
-        a.referrerPolicy = 'no-referrer';
-        a.rel = 'noopener noreferrer';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-      } else {
-        alert('Checkout error: ' + (data.error || ('status ' + r.status)));
-      }
-    } catch (e) {
-      alert('Network error contacting checkout service.');
-    }
-  }
-
-  document.querySelectorAll('[data-tier]').forEach(function(btn) {
-    btn.addEventListener('click', function() { startCheckout(btn.dataset.tier); });
+(async function(){
+  // Tier-button clicks on the landing page (organic visits) — nothing to
+  // do unless they came from the upstream. Without a ut they don't have a
+  // grant target.
+  document.querySelectorAll('[data-tier]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      alert('Please enroll from your account dashboard.');
+    });
   });
 
-  // Auto-flow is handled by the <head> script (kicks off the Worker fetch
-  // during HTML parse). This body script only wires up the click handlers
-  // for organic visitors who pick a tier from the landing page.
+  if (!window.__alpha.isCheckout) return;
+
+  const plan = window.__alpha.plan;
+  const ut   = window.__alpha.ut;
+  const cfg  = PLANS[plan];
+  if (!cfg) {
+    showStatus('Unknown plan.', 'err');
+    return;
+  }
+  document.getElementById('co-tier').textContent = cfg.label;
+  document.getElementById('co-amount').textContent = (cfg.price / 100).toFixed(2);
+  document.getElementById('co-pay-amount').textContent = (cfg.price / 100).toFixed(2);
+
+  // Wait for Square SDK to be ready (the <script> tag is async-loaded).
+  while (!window.Square) await new Promise(r => setTimeout(r, 50));
+
+  let card;
+  try {
+    const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION);
+    card = await payments.card();
+    await card.attach('#card-container');
+    document.getElementById('co-init').style.display = 'none';
+    document.getElementById('co-pay').disabled = false;
+  } catch (e) {
+    showStatus('Could not load the secure card form. Refresh to retry.', 'err');
+    return;
+  }
+
+  document.getElementById('co-pay').addEventListener('click', async function(){
+    const btn = this;
+    btn.disabled = true;
+    showStatus('<span class="checkout-spinner"></span>Processing…', '');
+
+    let tokenResult;
+    try {
+      tokenResult = await card.tokenize();
+    } catch (e) {
+      btn.disabled = false;
+      showStatus('Could not read card details. Please re-enter.', 'err');
+      return;
+    }
+    if (tokenResult.status !== 'OK') {
+      btn.disabled = false;
+      const msg = (tokenResult.errors && tokenResult.errors[0] && tokenResult.errors[0].message) || 'Invalid card details.';
+      showStatus(msg, 'err');
+      return;
+    }
+    const nonce = tokenResult.token;
+
+    // 3DS / SCA: only triggered for cards that require it. For most US
+    // cards this completes silently with no challenge.
+    let verToken = '';
+    try {
+      const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION);
+      const verResult = await payments.verifyBuyer(nonce, {
+        amount: (cfg.price / 100).toFixed(2),
+        currencyCode: 'USD',
+        intent: 'CHARGE',
+        billingContact: {},
+      });
+      verToken = (verResult && verResult.token) || '';
+    } catch (_) { /* card didn't need 3DS, proceed without */ }
+
+    let r;
+    try {
+      r = await fetch(WORKER_BASE + '/api/payments/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, ut, nonce, verificationToken: verToken }),
+      });
+    } catch (e) {
+      btn.disabled = false;
+      showStatus('Network error. Please try again.', 'err');
+      return;
+    }
+    let data = {};
+    try { data = await r.json(); } catch (_) {}
+
+    if (r.ok && data.ok) {
+      showStatus('✓ Payment received. Activating access…', 'ok');
+      let ret = '';
+      try { ret = localStorage.getItem('ac_ret') || ''; } catch (_) {}
+      try { localStorage.removeItem('ac_ret'); } catch (_) {}
+      setTimeout(function(){
+        if (ret && /^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) {
+          const a = document.createElement('a');
+          a.href = ret;
+          a.referrerPolicy = 'no-referrer';
+          a.rel = 'noopener noreferrer';
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+        } else {
+          showStatus('✓ Payment received. Access has been activated. You can close this tab.', 'ok');
+        }
+      }, 900);
+      return;
+    }
+
+    // Payment failed.
+    btn.disabled = false;
+    const err = (data && (data.detail || data.error)) || ('Status ' + r.status);
+    showStatus('Payment declined: ' + err, 'err');
+  });
+
+  function showStatus(html, cls) {
+    const el = document.getElementById('co-status');
+    el.className = 'checkout-status' + (cls ? ' ' + cls : '');
+    el.innerHTML = html;
+  }
 })();
 </script>
 

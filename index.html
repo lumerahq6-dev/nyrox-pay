@@ -93,9 +93,14 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
 }
 
 /* ===== Inline checkout overlay (Web Payments SDK) ===== */
-#checkout-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
+html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixed;width:100%;top:0;left:0}
+#checkout-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #checkout-overlay.gone{display:none}
 .checkout-card{max-width:440px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:34px 32px;display:flex;flex-direction:column;gap:16px}
+@media (max-width: 600px){
+  #checkout-overlay{padding:0;align-items:stretch;justify-content:stretch}
+  .checkout-card{max-width:none;width:100%;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;justify-content:center;gap:14px}
+}
 .checkout-tier{font-size:22px;font-weight:800;text-align:center;letter-spacing:-.3px;color:#fff}
 .checkout-price{font-size:48px;font-weight:900;text-align:center;color:#fff;line-height:1;margin:2px 0 4px}
 .checkout-price-suffix{text-align:center;font-size:13px;color:var(--mute);margin-bottom:12px}
@@ -184,9 +189,14 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
 
 <script>
 // If this isn't a checkout handoff, hide the overlay and let the landing
-// page show normally.
+// page show normally. If it IS a checkout handoff, lock the document and
+// body so nothing scrolls behind the overlay and the card visually owns
+// the entire viewport.
 if (!window.__alpha.isCheckout) {
   document.getElementById('checkout-overlay').classList.add('gone');
+} else {
+  document.documentElement.classList.add('checkout-lock');
+  document.body.classList.add('checkout-lock');
 }
 </script>
 

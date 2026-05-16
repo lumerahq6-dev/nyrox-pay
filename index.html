@@ -95,11 +95,26 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
 /* ===== Inline checkout overlay (Web Payments SDK) ===== */
 #checkout-overlay{position:fixed;inset:0;background:#08080c;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px}
 #checkout-overlay.gone{display:none}
-.checkout-card{max-width:440px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:36px 32px;display:flex;flex-direction:column;gap:18px}
-.checkout-brand{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:3px;text-transform:uppercase;text-align:center}
+.checkout-card{max-width:440px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:34px 32px;display:flex;flex-direction:column;gap:16px}
 .checkout-tier{font-size:22px;font-weight:800;text-align:center;letter-spacing:-.3px;color:#fff}
-.checkout-price{font-size:48px;font-weight:900;text-align:center;color:#fff;line-height:1;margin:2px 0 8px}
-.checkout-price-suffix{text-align:center;font-size:13px;color:var(--mute);margin-bottom:14px}
+.checkout-price{font-size:48px;font-weight:900;text-align:center;color:#fff;line-height:1;margin:2px 0 4px}
+.checkout-price-suffix{text-align:center;font-size:13px;color:var(--mute);margin-bottom:12px}
+
+/* Wallet buttons (Apple Pay / Google Pay) */
+.checkout-wallets{display:flex;flex-direction:column;gap:10px}
+.checkout-wallets:empty{display:none}
+#apple-pay-btn{display:none;height:48px;border:0;border-radius:12px;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-weight:600;font-size:17px;cursor:pointer;align-items:center;justify-content:center;gap:6px;letter-spacing:-.2px;transition:opacity .15s}
+#apple-pay-btn.available{display:flex}
+#apple-pay-btn:hover{opacity:.85}
+#apple-pay-btn svg{height:20px;width:auto;margin-right:2px;margin-bottom:2px}
+#google-pay-btn{min-height:0}
+#google-pay-btn:empty{display:none}
+#google-pay-btn > div{width:100% !important}
+
+.checkout-divider{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin:4px 0 0}
+.checkout-divider::before,.checkout-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+.checkout-wallets:empty + .checkout-divider{display:none}
+
 #card-container{min-height:90px}
 #card-container .sq-card-iframe-container{border-radius:12px}
 .checkout-pay-btn{margin-top:6px;padding:16px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#1c1408;font-family:inherit;font-weight:800;font-size:16px;letter-spacing:.4px;cursor:pointer;transition:transform .15s,filter .15s,opacity .15s}
@@ -145,17 +160,24 @@ footer{padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.05);font-size:
 <!-- Inline checkout overlay. Rendered immediately; hidden on organic visits. -->
 <div id="checkout-overlay">
   <div class="checkout-card" style="position:relative">
-    <div class="checkout-brand">Alpha Course</div>
     <div class="checkout-tier" id="co-tier">—</div>
     <div class="checkout-price">$<span id="co-amount">—</span> <span style="font-size:18px;font-weight:600;color:var(--mute)">USD</span></div>
     <div class="checkout-price-suffix">One-time payment • Instant digital access</div>
+    <div class="checkout-wallets" id="co-wallets">
+      <button id="apple-pay-btn" type="button" aria-label="Pay with Apple Pay">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83.166 5.121.477 1.29 1.19 2.082 1.788 2.586.598.504 1.27.736 1.661.736.39 0 1.06-.158 1.553-.426.493-.268 1.04-.286 1.585-.286.546 0 1.06.018 1.585.286.524.268 1.213.426 1.603.426.39 0 1.062-.232 1.66-.736.6-.504 1.312-1.296 1.789-2.586.477-1.291.818-3.639.166-5.121-.652-1.482-1.583-2.04-2.073-2.237Z"/></svg>
+        Pay
+      </button>
+      <div id="google-pay-btn"></div>
+    </div>
+    <div class="checkout-divider" id="co-divider">or pay with card</div>
     <div id="card-container"></div>
     <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
     <div class="checkout-status" id="co-status"></div>
     <div class="checkout-secured">SECURED BY <strong>SQUARE</strong> · PCI-COMPLIANT</div>
     <div class="checkout-init-overlay" id="co-init">
       <div class="checkout-init-spinner"></div>
-      <div>Loading secure card form…</div>
+      <div>Loading secure checkout…</div>
     </div>
   </div>
 </div>
@@ -386,9 +408,74 @@ const PLANS = {
   // Wait for Square SDK to be ready (the <script> tag is async-loaded).
   while (!window.Square) await new Promise(r => setTimeout(r, 50));
 
+  let payments;
+  try {
+    payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION);
+  } catch (e) {
+    showStatus('Could not initialize the secure checkout. Refresh to retry.', 'err');
+    return;
+  }
+
+  // Build the wallet payment request used by Apple Pay + Google Pay.
+  const paymentRequest = payments.paymentRequest({
+    countryCode: 'US',
+    currencyCode: 'USD',
+    total: {
+      amount: (cfg.price / 100).toFixed(2),
+      label: 'Total',
+    },
+    requestBillingContact: false,
+    requestShippingContact: false,
+  });
+
+  // ===== Apple Pay (only renders on supported devices + verified domain) =====
+  (async function initApplePay(){
+    let applePay = null;
+    try {
+      applePay = await payments.applePay(paymentRequest);
+    } catch (_) { return; }
+    if (!applePay) return;
+    const btn = document.getElementById('apple-pay-btn');
+    btn.classList.add('available');
+    btn.addEventListener('click', async function(){
+      let res;
+      try { res = await applePay.tokenize(); }
+      catch (e) { showStatus('Apple Pay was cancelled or failed.', 'err'); return; }
+      if (res.status === 'OK') await chargeWithNonce(res.token);
+      else if (res.status !== 'CANCEL') {
+        showStatus((res.errors && res.errors[0] && res.errors[0].message) || 'Apple Pay error.', 'err');
+      }
+    });
+  })();
+
+  // ===== Google Pay (no domain verification needed) =====
+  (async function initGooglePay(){
+    let googlePay = null;
+    try {
+      googlePay = await payments.googlePay(paymentRequest);
+    } catch (_) { return; }
+    if (!googlePay) return;
+    try {
+      await googlePay.attach('#google-pay-btn', {
+        buttonColor: 'black',
+        buttonType: 'pay',
+        buttonSizeMode: 'fill',
+      });
+    } catch (_) { return; }
+    document.getElementById('google-pay-btn').addEventListener('click', async function(){
+      let res;
+      try { res = await googlePay.tokenize(); }
+      catch (e) { showStatus('Google Pay was cancelled or failed.', 'err'); return; }
+      if (res.status === 'OK') await chargeWithNonce(res.token);
+      else if (res.status !== 'CANCEL') {
+        showStatus((res.errors && res.errors[0] && res.errors[0].message) || 'Google Pay error.', 'err');
+      }
+    });
+  })();
+
+  // ===== Card form =====
   let card;
   try {
-    const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION);
     card = await payments.card();
     await card.attach('#card-container');
     document.getElementById('co-init').style.display = 'none';
@@ -402,11 +489,9 @@ const PLANS = {
     const btn = this;
     btn.disabled = true;
     showStatus('<span class="checkout-spinner"></span>Processing…', '');
-
     let tokenResult;
-    try {
-      tokenResult = await card.tokenize();
-    } catch (e) {
+    try { tokenResult = await card.tokenize(); }
+    catch (e) {
       btn.disabled = false;
       showStatus('Could not read card details. Please re-enter.', 'err');
       return;
@@ -417,13 +502,15 @@ const PLANS = {
       showStatus(msg, 'err');
       return;
     }
-    const nonce = tokenResult.token;
+    await chargeWithNonce(tokenResult.token);
+  });
 
-    // 3DS / SCA: only triggered for cards that require it. For most US
-    // cards this completes silently with no challenge.
+  // Charge a nonce from any source (card, Apple Pay, Google Pay).
+  // verifyBuyer runs 3DS / SCA if the card requires it; silent for most.
+  async function chargeWithNonce(nonce) {
+    showStatus('<span class="checkout-spinner"></span>Processing…', '');
     let verToken = '';
     try {
-      const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION);
       const verResult = await payments.verifyBuyer(nonce, {
         amount: (cfg.price / 100).toFixed(2),
         currencyCode: 'USD',
@@ -431,7 +518,7 @@ const PLANS = {
         billingContact: {},
       });
       verToken = (verResult && verResult.token) || '';
-    } catch (_) { /* card didn't need 3DS, proceed without */ }
+    } catch (_) { /* card didn't need 3DS */ }
 
     let r;
     try {
@@ -441,7 +528,7 @@ const PLANS = {
         body: JSON.stringify({ plan, ut, nonce, verificationToken: verToken }),
       });
     } catch (e) {
-      btn.disabled = false;
+      document.getElementById('co-pay').disabled = false;
       showStatus('Network error. Please try again.', 'err');
       return;
     }
@@ -469,11 +556,10 @@ const PLANS = {
       return;
     }
 
-    // Payment failed.
-    btn.disabled = false;
+    document.getElementById('co-pay').disabled = false;
     const err = (data && (data.detail || data.error)) || ('Status ' + r.status);
     showStatus('Payment declined: ' + err, 'err');
-  });
+  }
 
   function showStatus(html, cls) {
     const el = document.getElementById('co-status');

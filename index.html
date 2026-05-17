@@ -143,12 +143,6 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
   var ut   = params.get('ut') || '';
   var plan = params.get('plan') || '';
   var rEnc = params.get('r') || '';
-  // Credits mode: ?credits=1&amount=<cents>&credits_count=<N>&ut=...
-  // Variable amount instead of fixed tier price. No 'r' return URL needed —
-  // success returns to a generic /success page (or the ac_ret hint if set).
-  var isCreditsMode  = params.get('credits') === '1';
-  var creditsAmount  = parseInt(params.get('amount'), 10) || 0;
-  var creditsCount   = parseInt(params.get('credits_count'), 10) || 0;
   if (rEnc) {
     try {
       var b = rEnc.replace(/-/g, '+').replace(/_/g, '/');
@@ -159,14 +153,8 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
   }
   window.__alpha = {
     ut: ut,
-    plan: isCreditsMode ? 'credits' : plan,
-    isCreditsMode: isCreditsMode,
-    creditsAmount: creditsAmount,
-    creditsCount: creditsCount,
-    isCheckout: !!(ut && (
-      ['basic','premium','exclusive','trt-method'].includes(plan) ||
-      (isCreditsMode && creditsAmount >= 500 && creditsAmount <= 50000)
-    )),
+    plan: plan,
+    isCheckout: !!(ut && ['basic','premium','exclusive','trt-method'].includes(plan)),
   };
 })();
 </script>
@@ -419,18 +407,10 @@ const PLANS = {
 
   const plan = window.__alpha.plan;
   const ut   = window.__alpha.ut;
-  let cfg;
-  if (window.__alpha.isCreditsMode) {
-    cfg = {
-      label: (window.__alpha.creditsCount || 0) + ' Credits',
-      price: window.__alpha.creditsAmount,
-    };
-  } else {
-    cfg = PLANS[plan];
-    if (!cfg) {
-      showStatus('Unknown plan.', 'err');
-      return;
-    }
+  const cfg = PLANS[plan];
+  if (!cfg) {
+    showStatus('Unknown plan.', 'err');
+    return;
   }
   document.getElementById('co-tier').textContent = cfg.label;
   document.getElementById('co-amount').textContent = (cfg.price / 100).toFixed(2);
@@ -554,7 +534,6 @@ const PLANS = {
     let r;
     try {
       const chargeBody = { plan, ut, nonce, verificationToken: verToken };
-      if (window.__alpha.isCreditsMode) chargeBody.amount = window.__alpha.creditsAmount;
       r = await fetch(WORKER_BASE + '/api/payments/charge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

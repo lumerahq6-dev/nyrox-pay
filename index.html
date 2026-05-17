@@ -164,7 +164,7 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
     creditsAmount: creditsAmount,
     creditsCount: creditsCount,
     isCheckout: !!(ut && (
-      ['basic','premium','exclusive'].includes(plan) ||
+      ['basic','premium','exclusive','trt-method'].includes(plan) ||
       (isCreditsMode && creditsAmount >= 500 && creditsAmount <= 50000)
     )),
   };
@@ -399,9 +399,10 @@ const SQUARE_LOCATION  = 'L6DGPA761FDNW';
 const WORKER_BASE      = 'https://alpha-course-api.alphacourse.workers.dev';
 
 const PLANS = {
-  basic:     { label: 'Foundations',       price: 799  },
-  premium:   { label: 'Pro Access',        price: 2499 },
-  exclusive: { label: 'Lifetime Mastery',  price: 3999 },
+  basic:        { label: 'Foundations',       price: 799  },
+  premium:      { label: 'Pro Access',        price: 2499 },
+  exclusive:    { label: 'Lifetime Mastery',  price: 3999 },
+  'trt-method': { label: 'TRT Method',        price: 299  },
 };
 
 (async function(){

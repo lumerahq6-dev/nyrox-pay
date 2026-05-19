@@ -164,6 +164,10 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 .checkout-crypto-status.ok{color:#7be59f}
 .checkout-crypto-status.wait{color:#ffd97a}
 .checkout-crypto-help{font-size:11px;color:var(--dim);text-align:center;line-height:1.5}
+
+/* Top-of-checkout billing-descriptor disclosure */
+.checkout-descriptor{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1.3px;text-transform:uppercase;text-align:center;padding:9px 12px;border:1px solid rgba(212,168,87,.25);background:rgba(212,168,87,.06);border-radius:8px;margin-bottom:4px}
+.checkout-descriptor strong{color:#ffd97a}
 </style>
 <script>
 // Detect upstream-handoff (?ut=&plan=&r=) very early so the inline checkout
@@ -195,6 +199,7 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 <!-- Inline checkout overlay. Rendered immediately; hidden on organic visits. -->
 <div id="checkout-overlay">
   <div class="checkout-card" style="position:relative">
+    <div class="checkout-descriptor">Purchase Shows As <strong>"Product"</strong> In Transaction</div>
     <div class="checkout-tier" id="co-tier">—</div>
     <div class="checkout-price">$<span id="co-amount">—</span> <span style="font-size:18px;font-weight:600;color:var(--mute)">USD</span></div>
     <div class="checkout-price-suffix">One-time payment • Instant digital access</div>

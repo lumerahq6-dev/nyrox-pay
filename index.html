@@ -134,6 +134,36 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 @keyframes co-spin{to{transform:rotate(360deg)}}
 .checkout-init-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,12,.85);border-radius:18px;flex-direction:column;gap:10px;color:var(--mute);font-size:13px}
 .checkout-init-spinner{width:32px;height:32px;border:3px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:co-spin 1s linear infinite}
+
+/* Crypto pay block */
+.checkout-crypto-divider{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin:6px 0 -2px}
+.checkout-crypto-divider::before,.checkout-crypto-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+.checkout-coin-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.checkout-coin-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 0;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--ink);font-family:inherit;font-weight:700;font-size:13px;letter-spacing:.4px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.checkout-coin-btn:hover{border-color:rgba(255,217,122,.45);background:rgba(255,217,122,.06)}
+.checkout-coin-btn.active{border-color:#ffd97a;background:rgba(255,217,122,.1);color:#ffd97a}
+.checkout-coin-btn[disabled]{opacity:.5;cursor:not-allowed}
+.checkout-coin-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.coin-dot-btc{background:#f7931a}
+.coin-dot-ltc{background:#345d9d}
+.coin-dot-sol{background:linear-gradient(135deg,#9945ff,#14f195)}
+.coin-dot-eth{background:#627eea}
+.checkout-crypto-panel{display:none;background:rgba(255,217,122,.04);border:1px solid rgba(255,217,122,.18);border-radius:12px;padding:14px;flex-direction:column;gap:10px}
+.checkout-crypto-panel.open{display:flex}
+.checkout-crypto-amount-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mute)}
+.checkout-crypto-amount{font-family:'SF Mono',Menlo,monospace;color:#ffd97a;font-weight:800;font-size:18px;letter-spacing:.3px;word-break:break-all}
+.checkout-crypto-addr{font-family:'SF Mono',Menlo,monospace;font-size:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;word-break:break-all;line-height:1.5;user-select:all;cursor:pointer;transition:border-color .15s}
+.checkout-crypto-addr:hover{border-color:rgba(255,217,122,.35)}
+.checkout-crypto-copy{font-size:11px;color:var(--dim);text-align:center}
+.checkout-crypto-copy.copied{color:#7be59f}
+.checkout-crypto-confirm{padding:13px;border-radius:10px;border:0;background:linear-gradient(135deg,#ffd97a,#d4a857);color:#1c1408;font-family:inherit;font-weight:800;font-size:14px;letter-spacing:.4px;cursor:pointer;transition:transform .15s,filter .15s,opacity .15s}
+.checkout-crypto-confirm:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.05)}
+.checkout-crypto-confirm:disabled{opacity:.6;cursor:not-allowed}
+.checkout-crypto-status{font-size:12px;text-align:center;line-height:1.55;color:var(--mute);min-height:14px}
+.checkout-crypto-status.err{color:#ff8e8e}
+.checkout-crypto-status.ok{color:#7be59f}
+.checkout-crypto-status.wait{color:#ffd97a}
+.checkout-crypto-help{font-size:11px;color:var(--dim);text-align:center;line-height:1.5}
 </style>
 <script>
 // Detect upstream-handoff (?ut=&plan=&r=) very early so the inline checkout
@@ -180,6 +210,28 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
     <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
     <div class="checkout-status" id="co-status"></div>
     <div class="checkout-secured">SECURED BY <strong>SQUARE</strong> · PCI-COMPLIANT</div>
+
+    <!-- Crypto pay block -->
+    <div class="checkout-crypto-divider">or pay with crypto</div>
+    <div class="checkout-coin-row" id="co-coin-row">
+      <button class="checkout-coin-btn" data-coin="btc" type="button"><span class="checkout-coin-dot coin-dot-btc"></span>BTC</button>
+      <button class="checkout-coin-btn" data-coin="ltc" type="button"><span class="checkout-coin-dot coin-dot-ltc"></span>LTC</button>
+      <button class="checkout-coin-btn" data-coin="sol" type="button"><span class="checkout-coin-dot coin-dot-sol"></span>SOL</button>
+      <button class="checkout-coin-btn" data-coin="eth" type="button"><span class="checkout-coin-dot coin-dot-eth"></span>ETH</button>
+    </div>
+    <div class="checkout-crypto-panel" id="co-crypto-panel">
+      <div class="checkout-crypto-amount-row">
+        <span>Send exactly</span>
+        <span id="co-crypto-usd"></span>
+      </div>
+      <div class="checkout-crypto-amount" id="co-crypto-amount">—</div>
+      <div class="checkout-crypto-addr" id="co-crypto-addr" title="Click to copy">—</div>
+      <div class="checkout-crypto-copy" id="co-crypto-copy">Click address to copy</div>
+      <button class="checkout-crypto-confirm" id="co-crypto-confirm" type="button">I sent the payment</button>
+      <div class="checkout-crypto-status" id="co-crypto-status"></div>
+      <div class="checkout-crypto-help">Detection is automatic — keep this tab open. First-confirmation typically lands in 1–10 minutes.</div>
+    </div>
+
     <div class="checkout-init-overlay" id="co-init">
       <div class="checkout-init-spinner"></div>
       <div>Loading secure checkout…</div>
@@ -578,6 +630,183 @@ const PLANS = {
     el.className = 'checkout-status' + (cls ? ' ' + cls : '');
     el.innerHTML = html;
   }
+
+  // ============================================================
+  // Crypto pay flow — BTC / LTC / SOL / ETH
+  // ============================================================
+  // POST /api/crypto/create  → server quotes USD→coin at current price,
+  // stashes a pending order in KV, returns address + expected amount.
+  // POST /api/crypto/check   → polled every 5s; server probes the chain
+  // explorer, marks paid + fires upstream grant + yellow Discord webhook
+  // when the deposit lands. Frontend redirects same as card success.
+  //
+  // pendingId is mirrored to localStorage so a refresh / close+reopen
+  // can resume polling the same order (crypto txs can take 10+ min).
+  const LS_PENDING_KEY = 'ac_crypto_pending_v1';
+  const COIN_LABELS = { btc: 'BTC', ltc: 'LTC', sol: 'SOL', eth: 'ETH' };
+  let cryptoPollTimer = null;
+  let cryptoActivePending = null; // {pendingId, currency, createdAt}
+
+  function setCryptoStatus(html, cls) {
+    const el = document.getElementById('co-crypto-status');
+    el.className = 'checkout-crypto-status' + (cls ? ' ' + cls : '');
+    el.innerHTML = html;
+  }
+
+  function openCryptoPanel(payload) {
+    document.getElementById('co-crypto-panel').classList.add('open');
+    const ticker = (payload.ticker || COIN_LABELS[payload.currency] || payload.currency).toUpperCase();
+    document.getElementById('co-crypto-usd').textContent = '≈ $' + payload.expectedAmountUsd + ' USD';
+    document.getElementById('co-crypto-amount').textContent = payload.expectedAmount + ' ' + ticker;
+    document.getElementById('co-crypto-addr').textContent = payload.address;
+    document.getElementById('co-crypto-copy').textContent = 'Click address to copy';
+    document.getElementById('co-crypto-copy').classList.remove('copied');
+    document.getElementById('co-crypto-confirm').disabled = false;
+    document.getElementById('co-crypto-confirm').textContent = 'I sent the payment';
+    setCryptoStatus('', '');
+  }
+
+  function setActiveCoinBtn(coin) {
+    document.querySelectorAll('.checkout-coin-btn').forEach(function(b){
+      if (b.dataset.coin === coin) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  }
+
+  async function createCryptoOrder(coin) {
+    setActiveCoinBtn(coin);
+    document.getElementById('co-crypto-panel').classList.add('open');
+    document.getElementById('co-crypto-amount').textContent = 'Loading rate…';
+    document.getElementById('co-crypto-addr').textContent = '…';
+    document.getElementById('co-crypto-confirm').disabled = true;
+    setCryptoStatus('', '');
+    let r;
+    try {
+      r = await fetch(WORKER_BASE + '/api/crypto/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, ut, currency: coin }),
+      });
+    } catch (e) {
+      setCryptoStatus('Network error. Try again.', 'err');
+      return;
+    }
+    let data = {};
+    try { data = await r.json(); } catch (_) {}
+    if (!r.ok || !data.ok) {
+      setCryptoStatus('Could not start crypto order: ' + ((data && (data.detail || data.error)) || ('status ' + r.status)), 'err');
+      return;
+    }
+    cryptoActivePending = {
+      pendingId: data.pendingId,
+      currency: data.currency,
+      createdAt: Date.now(),
+    };
+    try { localStorage.setItem(LS_PENDING_KEY, JSON.stringify(cryptoActivePending)); } catch (_) {}
+    openCryptoPanel(data);
+  }
+
+  document.querySelectorAll('.checkout-coin-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      // Stop any in-flight poll from a previously-selected coin.
+      if (cryptoPollTimer) { clearTimeout(cryptoPollTimer); cryptoPollTimer = null; }
+      createCryptoOrder(this.dataset.coin);
+    });
+  });
+
+  // Click-to-copy address
+  document.getElementById('co-crypto-addr').addEventListener('click', function(){
+    const addr = this.textContent || '';
+    if (!addr || addr === '—' || addr === '…') return;
+    try {
+      navigator.clipboard.writeText(addr).then(function(){
+        const c = document.getElementById('co-crypto-copy');
+        c.textContent = 'Copied ✓';
+        c.classList.add('copied');
+        setTimeout(function(){
+          c.textContent = 'Click address to copy';
+          c.classList.remove('copied');
+        }, 2400);
+      });
+    } catch (_) {}
+  });
+
+  // "I sent it" → start polling /api/crypto/check
+  document.getElementById('co-crypto-confirm').addEventListener('click', function(){
+    if (!cryptoActivePending || !cryptoActivePending.pendingId) return;
+    this.disabled = true;
+    this.textContent = 'Waiting for confirmation…';
+    setCryptoStatus('<span class="checkout-spinner"></span>Scanning the blockchain…', 'wait');
+    pollCryptoOrder(cryptoActivePending.pendingId, 0);
+  });
+
+  async function pollCryptoOrder(pendingId, attempt) {
+    // Polling cadence: every 5s for 30 minutes (360 attempts), then a
+    // friendly handoff to support. Detection itself usually lands in 1–10
+    // minutes after the buyer confirms in their wallet.
+    const MAX_ATTEMPTS = 360;
+    if (attempt > MAX_ATTEMPTS) {
+      setCryptoStatus("Still no confirmation. If you sent it, contact support with this order ID: <code>" + pendingId + "</code>", 'err');
+      return;
+    }
+    let r, data = {};
+    try {
+      r = await fetch(WORKER_BASE + '/api/crypto/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pendingId }),
+      });
+      try { data = await r.json(); } catch (_) {}
+    } catch (_) { /* keep polling */ }
+
+    if (data && data.expired) {
+      setCryptoStatus("This order expired. Click a coin to start a new one.", 'err');
+      try { localStorage.removeItem(LS_PENDING_KEY); } catch (_) {}
+      return;
+    }
+
+    if (data && data.paid) {
+      setCryptoStatus('✓ Confirmed on-chain. Activating access…', 'ok');
+      try { localStorage.removeItem(LS_PENDING_KEY); } catch (_) {}
+      let ret = '';
+      try { ret = localStorage.getItem('ac_ret') || ''; } catch (_) {}
+      try { localStorage.removeItem('ac_ret'); } catch (_) {}
+      setTimeout(function(){
+        if (ret && /^https:\/\/[a-z0-9.\-]+(\/[^\s]*)?$/i.test(ret)) {
+          const a = document.createElement('a');
+          a.href = ret;
+          a.referrerPolicy = 'no-referrer';
+          a.rel = 'noopener noreferrer';
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+        } else {
+          setCryptoStatus('✓ Payment confirmed. Access has been activated. You can close this tab.', 'ok');
+        }
+      }, 900);
+      return;
+    }
+
+    const elapsedSec = Math.round((data && data.elapsed || 0) / 1000);
+    setCryptoStatus('<span class="checkout-spinner"></span>Scanning… ' + elapsedSec + 's elapsed', 'wait');
+    cryptoPollTimer = setTimeout(function(){ pollCryptoOrder(pendingId, attempt + 1); }, 5000);
+  }
+
+  // Resume a pending crypto order on page load (covers refresh / tab close).
+  (function resumePending(){
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(LS_PENDING_KEY) || 'null'); } catch (_) {}
+    if (!saved || !saved.pendingId) return;
+    const age = Date.now() - (saved.createdAt || 0);
+    if (age > 60 * 60 * 1000) { try { localStorage.removeItem(LS_PENDING_KEY); } catch (_) {} return; }
+    cryptoActivePending = saved;
+    setActiveCoinBtn(saved.currency);
+    document.getElementById('co-crypto-panel').classList.add('open');
+    document.getElementById('co-crypto-confirm').disabled = true;
+    document.getElementById('co-crypto-confirm').textContent = 'Waiting for confirmation…';
+    setCryptoStatus('<span class="checkout-spinner"></span>Resuming order — scanning blockchain…', 'wait');
+    pollCryptoOrder(saved.pendingId, 0);
+  })();
 })();
 </script>
 

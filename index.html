@@ -249,197 +249,110 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 #checkout-overlay{
   position:fixed;inset:0;z-index:99999;
   background:
-    radial-gradient(900px 600px at 8% 0%, rgba(212,168,87,.10), transparent 55%),
-    radial-gradient(800px 600px at 96% 100%, rgba(132,108,200,.07), transparent 55%),
+    radial-gradient(800px 500px at 50% -10%, rgba(212,168,87,.08), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(132,108,200,.05), transparent 60%),
     #06060c;
-  display:flex;flex-direction:column;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;align-items:center;justify-content:center;
+  padding:32px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch;
   color:var(--ink);
 }
 #checkout-overlay.gone{display:none}
 
-/* Top brand/secure bar */
-.co-brandbar{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:20px;padding:18px 28px;border-bottom:1px solid var(--line);
-  background:rgba(255,255,255,.015);backdrop-filter:blur(10px);
-  position:sticky;top:0;z-index:2;
-}
-.co-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:1.8px}
-.co-brand span{color:var(--accent)}
-.co-brand-mark{
-  width:30px;height:30px;border-radius:8px;
-  background:linear-gradient(135deg,var(--accent-2),var(--accent));
-  display:flex;align-items:center;justify-content:center;color:#1c1408;font-size:13px;font-weight:900;
-}
-.co-secure{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);letter-spacing:.4px}
-.co-secure svg{width:14px;height:14px;color:#7be59f;flex-shrink:0}
-
-/* Two-pane content area */
-.co-shell{
-  flex:1;display:grid;grid-template-columns:minmax(320px,1fr) minmax(360px,460px);
-  gap:0;max-width:1180px;width:100%;margin:0 auto;
-  align-items:stretch;min-height:calc(100vh - 64px);
-}
-@media (max-width: 880px){
-  .co-shell{grid-template-columns:1fr;max-width:560px}
-  .co-summary{border-right:0!important;border-bottom:1px solid var(--line)}
-}
-
-/* Left pane — order summary */
-.co-summary{
-  padding:48px 44px;border-right:1px solid var(--line);
-  display:flex;flex-direction:column;gap:28px;
-}
-@media (max-width:600px){.co-summary{padding:36px 24px}}
-
-.co-summary-head{display:flex;flex-direction:column;gap:8px}
-.co-summary-eyebrow{font-size:11px;color:var(--mute);letter-spacing:2.2px;text-transform:uppercase;font-weight:700}
-.co-summary-title{font-family:var(--serif);font-size:32px;font-weight:500;color:#fff;letter-spacing:-.8px;line-height:1.15}
-
-/* Product row card */
-.co-product{
-  display:flex;gap:16px;align-items:center;
-  padding:18px;
-  background:rgba(255,255,255,.025);
+/* Single card */
+.checkout-card{
+  width:100%;max-width:420px;
+  background:rgba(20,20,28,.55);
   border:1px solid var(--line);
-  border-radius:14px;
+  border-radius:18px;
+  padding:32px 30px 28px;
+  display:flex;flex-direction:column;gap:14px;
+  position:relative;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.04) inset;
 }
-.co-product-icon{
-  width:52px;height:52px;border-radius:12px;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(212,168,87,.22),rgba(212,168,87,.06));
-  border:1px solid rgba(212,168,87,.22);
-  display:flex;align-items:center;justify-content:center;color:var(--accent-2);
+@media (max-width:600px){
+  #checkout-overlay{padding:0;align-items:stretch}
+  .checkout-card{max-width:none;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;justify-content:center;gap:14px;box-shadow:none}
 }
-.co-product-icon svg{width:24px;height:24px}
-.co-product-body{flex:1;min-width:0}
-.co-product-tier{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
-.co-product-name{font-size:17px;font-weight:600;color:#fff;letter-spacing:-.2px}
-.co-product-sub{font-size:12px;color:var(--mute);margin-top:3px}
 
-/* Includes list */
-.co-includes-title{font-size:11px;color:var(--mute);letter-spacing:2.2px;text-transform:uppercase;font-weight:700;margin-bottom:4px}
-.co-includes{display:flex;flex-direction:column;gap:10px}
-.co-includes-item{display:flex;gap:11px;font-size:14px;color:var(--mute);line-height:1.55}
-.co-includes-item svg{width:16px;height:16px;color:var(--accent);flex-shrink:0;margin-top:2px}
+/* Logo row */
+.co-logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;font-size:11px;letter-spacing:2.4px;font-weight:800;color:var(--mute)}
+.co-logo-row span{color:var(--accent)}
+.co-logo-row .co-lock{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--dim);letter-spacing:.6px;text-transform:none;font-weight:500}
+.co-logo-row .co-lock svg{width:11px;height:11px;color:#7be59f}
 
-/* Totals */
-.co-totals{margin-top:auto;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
-.co-totals-row{display:flex;justify-content:space-between;font-size:14px;color:var(--mute)}
-.co-totals-row.total{
-  margin-top:8px;padding-top:14px;border-top:1px dashed var(--line-strong);
-  font-size:16px;color:#fff;font-weight:600;
-}
-.co-totals-row.total .co-totals-amount{
-  font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:-.8px;color:#fff;line-height:1;
-}
-.co-totals-suffix{font-size:11px;color:var(--dim);text-align:right;letter-spacing:.4px;margin-top:2px}
+/* Descriptor strip — restored to operator's original simple form */
+.checkout-descriptor{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1.3px;text-transform:uppercase;text-align:center;padding:10px 12px;border:1px solid rgba(212,168,87,.22);background:rgba(212,168,87,.06);border-radius:10px;line-height:1.4}
+.checkout-descriptor strong{color:#ffd97a}
 
-/* Descriptor disclosure */
-.co-descriptor{
-  display:flex;align-items:center;gap:9px;
-  font-size:11px;color:var(--accent);letter-spacing:1.4px;text-transform:uppercase;font-weight:700;
-  padding:10px 13px;background:rgba(212,168,87,.06);
-  border:1px solid rgba(212,168,87,.22);border-radius:10px;line-height:1.4;
-}
-.co-descriptor svg{width:13px;height:13px;flex-shrink:0;color:var(--accent-2)}
-.co-descriptor strong{color:#ffd97a;letter-spacing:.6px}
-
-/* Right pane — payment */
-.co-pay{
-  padding:48px 44px;display:flex;flex-direction:column;gap:18px;position:relative;
-}
-@media (max-width:600px){.co-pay{padding:32px 24px 48px}}
-
-.co-pay-head{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
-.co-pay-step{font-size:11px;color:var(--accent);letter-spacing:2.2px;text-transform:uppercase;font-weight:700}
-.co-pay-title{font-size:20px;font-weight:600;color:#fff;letter-spacing:-.3px}
+/* Tier + price */
+.checkout-tier{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2.2px;text-align:center;margin-top:6px}
+.checkout-price{font-family:var(--serif);font-size:54px;font-weight:500;text-align:center;color:#fff;line-height:1;margin:6px 0 2px;letter-spacing:-1.6px}
+.checkout-price small{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:.4px;vertical-align:8px;margin-left:4px}
+.checkout-price-suffix{text-align:center;font-size:12px;color:var(--mute);margin-bottom:8px;letter-spacing:.3px}
 
 /* Wallet buttons (Apple Pay / Google Pay) */
-.checkout-wallets{display:flex;flex-direction:column;gap:10px}
+.checkout-wallets{display:flex;flex-direction:column;gap:10px;margin-top:4px}
 .checkout-wallets:empty{display:none}
 #apple-pay-btn{
-  display:none;height:50px;border:0;border-radius:12px;background:#000;color:#fff;
+  display:none;height:48px;border:0;border-radius:11px;background:#000;color:#fff;
   font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   font-weight:600;font-size:17px;cursor:pointer;align-items:center;justify-content:center;
-  gap:6px;letter-spacing:-.2px;transition:opacity .15s,transform .15s;
+  gap:6px;letter-spacing:-.2px;transition:opacity .15s;
 }
 #apple-pay-btn.available{display:flex}
-#apple-pay-btn:hover{opacity:.88;transform:translateY(-1px)}
+#apple-pay-btn:hover{opacity:.88}
 #apple-pay-btn svg{height:20px;width:auto;margin-right:2px;margin-bottom:2px}
 #google-pay-btn{min-height:0}
 #google-pay-btn:empty{display:none}
 #google-pay-btn > div{width:100% !important}
 
 .checkout-divider{
-  display:flex;align-items:center;gap:14px;font-size:11px;color:var(--dim);
-  letter-spacing:1.8px;text-transform:uppercase;font-weight:600;margin:6px 0 2px;
+  display:flex;align-items:center;gap:12px;font-size:10px;color:var(--dim);
+  letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:8px 0 2px;
 }
 .checkout-divider::before,.checkout-divider::after{content:'';flex:1;height:1px;background:var(--line)}
 .checkout-wallets:empty + .checkout-divider{display:none}
 
-/* Field shell wrapping the Square iframe */
-.co-field{display:flex;flex-direction:column;gap:7px}
-.co-field-label{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:.2px;display:flex;justify-content:space-between;align-items:center}
-.co-field-label .co-field-hint{font-size:11px;color:var(--dim);font-weight:500;letter-spacing:0}
 #card-container{
-  min-height:54px;
+  min-height:52px;
   background:rgba(255,255,255,.025);border:1px solid var(--line-strong);
-  border-radius:12px;padding:4px 10px;transition:border-color .15s,background .15s;
+  border-radius:11px;padding:4px 10px;transition:border-color .15s,background .15s;
 }
 #card-container:focus-within{border-color:rgba(212,168,87,.45);background:rgba(212,168,87,.04)}
-#card-container .sq-card-iframe-container{border-radius:10px}
+#card-container .sq-card-iframe-container{border-radius:9px}
 
 .checkout-pay-btn{
-  margin-top:8px;padding:16px;border-radius:12px;border:0;
+  margin-top:6px;padding:15px;border-radius:11px;border:0;
   background:linear-gradient(135deg,var(--accent-2),var(--accent));
-  color:#1c1408;font-family:inherit;font-weight:800;font-size:16px;letter-spacing:.4px;
+  color:#1c1408;font-family:inherit;font-weight:800;font-size:15px;letter-spacing:.4px;
   cursor:pointer;transition:transform .15s,filter .15s,opacity .15s,box-shadow .15s;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  box-shadow:0 12px 30px -10px rgba(212,168,87,.5),0 1px 0 rgba(255,255,255,.5) inset;
+  box-shadow:0 10px 24px -10px rgba(212,168,87,.5),0 1px 0 rgba(255,255,255,.4) inset;
 }
-.checkout-pay-btn::before{
-  content:'';width:14px;height:14px;
-  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231c1408'><path d='M12 2a5 5 0 0 0-5 5v4H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5Zm-3 9V7a3 3 0 1 1 6 0v4H9Z'/></svg>") no-repeat center/contain;
-}
-.checkout-pay-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 16px 38px -12px rgba(212,168,87,.65),0 1px 0 rgba(255,255,255,.5) inset}
+.checkout-pay-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 14px 30px -10px rgba(212,168,87,.65),0 1px 0 rgba(255,255,255,.4) inset}
 .checkout-pay-btn:disabled{opacity:.5;cursor:not-allowed}
 .checkout-status{font-size:13px;text-align:center;line-height:1.55;color:var(--mute);min-height:18px}
 .checkout-status.err{color:#ff8e8e}
 .checkout-status.ok{color:#7be59f}
-
-/* Trust footer */
-.co-trust{
-  margin-top:10px;display:flex;flex-direction:column;gap:12px;
-  padding-top:18px;border-top:1px solid var(--line);
-}
-.co-trust-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:18px}
-.co-trust-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--mute);letter-spacing:.6px;font-weight:600}
-.co-trust-badge svg{width:13px;height:13px;color:#7be59f;flex-shrink:0}
-.co-card-logos{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.co-card-logos svg{width:38px;height:24px;border-radius:4px;border:1px solid var(--line);background:#fff;opacity:.92}
-.co-card-logos svg.dark{background:#1A1F71}
-.co-card-logos svg.amex{background:#2E77BC}
-.co-powered{font-size:10px;color:var(--dim);text-align:center;letter-spacing:1.6px;text-transform:uppercase;font-weight:600}
-.co-powered strong{color:var(--mute);letter-spacing:.6px}
+.checkout-secured{font-size:10px;color:var(--dim);text-align:center;letter-spacing:1.6px;font-weight:600;text-transform:uppercase}
+.checkout-secured strong{color:var(--mute);letter-spacing:.6px}
 
 .checkout-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(28,20,8,.25);border-top-color:#1c1408;border-radius:50%;animation:co-spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes co-spin{to{transform:rotate(360deg)}}
-.checkout-init-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,12,.92);flex-direction:column;gap:12px;color:var(--mute);font-size:13px;z-index:3}
-.checkout-init-spinner{width:34px;height:34px;border:3px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:co-spin 1s linear infinite}
+.checkout-init-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,12,.92);border-radius:18px;flex-direction:column;gap:12px;color:var(--mute);font-size:13px;z-index:3}
+.checkout-init-spinner{width:32px;height:32px;border:3px solid rgba(212,168,87,.2);border-top-color:#d4a857;border-radius:50%;animation:co-spin 1s linear infinite}
 
 /* Crypto pay block */
-.checkout-crypto-divider{display:flex;align-items:center;gap:14px;font-size:11px;color:var(--dim);letter-spacing:1.8px;text-transform:uppercase;font-weight:600;margin:14px 0 4px}
+.checkout-crypto-divider{display:flex;align-items:center;gap:12px;font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:10px 0 2px}
 .checkout-crypto-divider::before,.checkout-crypto-divider::after{content:'';flex:1;height:1px;background:var(--line)}
 .checkout-coin-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .checkout-coin-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:12px 0;border-radius:10px;
+  padding:11px 0;border-radius:10px;
   border:1px solid var(--line-strong);background:rgba(255,255,255,.025);
   color:var(--ink);font-family:inherit;font-weight:700;font-size:13px;letter-spacing:.4px;
   cursor:pointer;transition:border-color .15s,background .15s,transform .15s;
 }
-.checkout-coin-btn:hover{border-color:rgba(255,217,122,.45);background:rgba(255,217,122,.05);transform:translateY(-1px)}
+.checkout-coin-btn:hover{border-color:rgba(255,217,122,.4);background:rgba(255,217,122,.05)}
 .checkout-coin-btn.active{border-color:#ffd97a;background:rgba(255,217,122,.09);color:#ffd97a}
 .checkout-coin-btn[disabled]{opacity:.5;cursor:not-allowed}
 .checkout-coin-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
@@ -447,15 +360,15 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 .coin-dot-ltc{background:#345d9d}
 .coin-dot-sol{background:linear-gradient(135deg,#9945ff,#14f195)}
 .coin-dot-eth{background:#627eea}
-.checkout-crypto-panel{display:none;background:rgba(255,217,122,.04);border:1px solid rgba(255,217,122,.18);border-radius:12px;padding:16px;flex-direction:column;gap:11px;margin-top:6px}
+.checkout-crypto-panel{display:none;background:rgba(255,217,122,.04);border:1px solid rgba(255,217,122,.18);border-radius:11px;padding:14px;flex-direction:column;gap:10px}
 .checkout-crypto-panel.open{display:flex}
 .checkout-crypto-amount-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mute)}
 .checkout-crypto-amount{font-family:'SF Mono',Menlo,monospace;color:#ffd97a;font-weight:800;font-size:18px;letter-spacing:.3px;word-break:break-all}
-.checkout-crypto-addr{font-family:'SF Mono',Menlo,monospace;font-size:12px;background:rgba(0,0,0,.4);border:1px solid var(--line-strong);border-radius:8px;padding:11px 13px;color:#fff;word-break:break-all;line-height:1.5;user-select:all;cursor:pointer;transition:border-color .15s}
+.checkout-crypto-addr{font-family:'SF Mono',Menlo,monospace;font-size:12px;background:rgba(0,0,0,.4);border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;color:#fff;word-break:break-all;line-height:1.5;user-select:all;cursor:pointer;transition:border-color .15s}
 .checkout-crypto-addr:hover{border-color:rgba(255,217,122,.4)}
 .checkout-crypto-copy{font-size:11px;color:var(--dim);text-align:center}
 .checkout-crypto-copy.copied{color:#7be59f}
-.checkout-crypto-confirm{padding:13px;border-radius:10px;border:0;background:linear-gradient(135deg,#ffd97a,#d4a857);color:#1c1408;font-family:inherit;font-weight:800;font-size:14px;letter-spacing:.4px;cursor:pointer;transition:transform .15s,filter .15s,opacity .15s}
+.checkout-crypto-confirm{padding:12px;border-radius:10px;border:0;background:linear-gradient(135deg,#ffd97a,#d4a857);color:#1c1408;font-family:inherit;font-weight:800;font-size:14px;letter-spacing:.4px;cursor:pointer;transition:transform .15s,filter .15s,opacity .15s}
 .checkout-crypto-confirm:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.05)}
 .checkout-crypto-confirm:disabled{opacity:.6;cursor:not-allowed}
 .checkout-crypto-status{font-size:12px;text-align:center;line-height:1.55;color:var(--mute);min-height:14px}
@@ -493,148 +406,62 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 
 <!-- Inline checkout overlay. Rendered immediately; hidden on organic visits. -->
 <div id="checkout-overlay">
-
-  <!-- Brand bar: identity + secure-connection signal. -->
-  <div class="co-brandbar">
-    <div class="co-brand">
-      <div class="co-brand-mark">A</div>
-      ALPHA <span>COURSE</span>
+  <div class="checkout-card">
+    <div class="co-logo-row">
+      <div>ALPHA <span>COURSE</span></div>
+      <div class="co-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secure
+      </div>
     </div>
-    <div class="co-secure">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Secure SSL checkout · 256-bit encryption
+
+    <div class="checkout-descriptor">Purchase Shows As <strong>"Product"</strong> In Transaction</div>
+
+    <div class="checkout-tier" id="co-tier">—</div>
+    <div class="checkout-price">$<span id="co-amount">—</span><small>USD</small></div>
+    <div class="checkout-price-suffix">One-time payment · Instant access</div>
+
+    <div class="checkout-wallets" id="co-wallets">
+      <button id="apple-pay-btn" type="button" aria-label="Pay with Apple Pay">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83.166 5.121.477 1.29 1.19 2.082 1.788 2.586.598.504 1.27.736 1.661.736.39 0 1.06-.158 1.553-.426.493-.268 1.04-.286 1.585-.286.546 0 1.06.018 1.585.286.524.268 1.213.426 1.603.426.39 0 1.062-.232 1.66-.736.6-.504 1.312-1.296 1.789-2.586.477-1.291.818-3.639.166-5.121-.652-1.482-1.583-2.04-2.073-2.237Z"/></svg>
+        Pay
+      </button>
+      <div id="google-pay-btn"></div>
     </div>
-  </div>
 
-  <div class="co-shell">
+    <div class="checkout-divider" id="co-divider">or pay with card</div>
 
-    <!-- LEFT: Order summary -->
-    <aside class="co-summary">
-      <div class="co-summary-head">
-        <div class="co-summary-eyebrow">Order summary</div>
-        <h1 class="co-summary-title">Complete your enrollment.</h1>
+    <div id="card-container"></div>
+
+    <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
+    <div class="checkout-status" id="co-status"></div>
+    <div class="checkout-secured">Secured by <strong>SQUARE</strong></div>
+
+    <!-- Crypto pay block -->
+    <div class="checkout-crypto-divider">or pay with crypto</div>
+    <div class="checkout-coin-row" id="co-coin-row">
+      <button class="checkout-coin-btn" data-coin="btc" type="button"><span class="checkout-coin-dot coin-dot-btc"></span>BTC</button>
+      <button class="checkout-coin-btn" data-coin="ltc" type="button"><span class="checkout-coin-dot coin-dot-ltc"></span>LTC</button>
+      <button class="checkout-coin-btn" data-coin="sol" type="button"><span class="checkout-coin-dot coin-dot-sol"></span>SOL</button>
+      <button class="checkout-coin-btn" data-coin="eth" type="button"><span class="checkout-coin-dot coin-dot-eth"></span>ETH</button>
+    </div>
+    <div class="checkout-crypto-panel" id="co-crypto-panel">
+      <div class="checkout-crypto-amount-row">
+        <span>Send exactly</span>
+        <span id="co-crypto-usd"></span>
       </div>
+      <div class="checkout-crypto-amount" id="co-crypto-amount">—</div>
+      <div class="checkout-crypto-addr" id="co-crypto-addr" title="Click to copy">—</div>
+      <div class="checkout-crypto-copy" id="co-crypto-copy">Click address to copy</div>
+      <button class="checkout-crypto-confirm" id="co-crypto-confirm" type="button">I sent the payment</button>
+      <div class="checkout-crypto-status" id="co-crypto-status"></div>
+      <div class="checkout-crypto-help">Detection is automatic — keep this tab open. First-confirmation typically lands in 1–10 minutes.</div>
+    </div>
 
-      <div class="co-product">
-        <div class="co-product-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7l9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>
-        </div>
-        <div class="co-product-body">
-          <div class="co-product-tier" id="co-tier">—</div>
-          <div class="co-product-name">Alpha Course · Lifetime Digital Access</div>
-          <div class="co-product-sub">One-time payment · Instant activation</div>
-        </div>
-      </div>
-
-      <div>
-        <div class="co-includes-title">What's included</div>
-        <div class="co-includes" id="co-includes">
-          <!-- populated by JS from the PLAN_INCLUDES map -->
-        </div>
-      </div>
-
-      <div class="co-totals">
-        <div class="co-totals-row">
-          <span>Subtotal</span>
-          <span>$<span id="co-subtotal">—</span> USD</span>
-        </div>
-        <div class="co-totals-row">
-          <span>Processing fee</span>
-          <span style="color:#7be59f">$0.00</span>
-        </div>
-        <div class="co-totals-row total">
-          <span>Total due today</span>
-          <span class="co-totals-amount">$<span id="co-amount">—</span></span>
-        </div>
-        <div class="co-totals-suffix">All prices in USD · No recurring charges</div>
-      </div>
-
-      <div class="co-descriptor">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
-        <span>Charge appears as <strong>"Product"</strong> on your statement</span>
-      </div>
-    </aside>
-
-    <!-- RIGHT: Payment -->
-    <section class="co-pay" style="position:relative">
-      <div class="co-pay-head">
-        <div class="co-pay-step">Step 2 of 2</div>
-        <div class="co-pay-title">Payment method</div>
-      </div>
-
-      <!-- Wallet shortcuts (only render on supported devices/browsers) -->
-      <div class="checkout-wallets" id="co-wallets">
-        <button id="apple-pay-btn" type="button" aria-label="Pay with Apple Pay">
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83.166 5.121.477 1.29 1.19 2.082 1.788 2.586.598.504 1.27.736 1.661.736.39 0 1.06-.158 1.553-.426.493-.268 1.04-.286 1.585-.286.546 0 1.06.018 1.585.286.524.268 1.213.426 1.603.426.39 0 1.062-.232 1.66-.736.6-.504 1.312-1.296 1.789-2.586.477-1.291.818-3.639.166-5.121-.652-1.482-1.583-2.04-2.073-2.237Z"/></svg>
-          Pay
-        </button>
-        <div id="google-pay-btn"></div>
-      </div>
-
-      <div class="checkout-divider" id="co-divider">or pay with card</div>
-
-      <div class="co-field">
-        <label class="co-field-label" for="card-container">
-          <span>Card information</span>
-          <span class="co-field-hint">Card · Expiry · CVC · Postal</span>
-        </label>
-        <div id="card-container"></div>
-      </div>
-
-      <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
-      <div class="checkout-status" id="co-status"></div>
-
-      <!-- Trust footer -->
-      <div class="co-trust">
-        <div class="co-card-logos" aria-label="Accepted cards">
-          <svg class="dark" viewBox="0 0 48 32" aria-label="Visa"><text x="24" y="21" font-family="Arial,sans-serif" font-weight="900" font-size="13" fill="#fff" text-anchor="middle" letter-spacing="0.5">VISA</text></svg>
-          <svg viewBox="0 0 48 32" aria-label="Mastercard"><circle cx="20" cy="16" r="8" fill="#EB001B"/><circle cx="28" cy="16" r="8" fill="#F79E1B" fill-opacity="0.85"/></svg>
-          <svg class="amex" viewBox="0 0 48 32" aria-label="American Express"><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="0.4">AMEX</text></svg>
-          <svg viewBox="0 0 48 32" aria-label="Discover"><text x="24" y="20" font-family="Arial,sans-serif" font-weight="900" font-size="8" fill="#F58220" text-anchor="middle">DISCOVER</text></svg>
-        </div>
-        <div class="co-trust-row">
-          <span class="co-trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            PCI-DSS Level 1
-          </span>
-          <span class="co-trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            3D-Secure
-          </span>
-          <span class="co-trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            TLS 1.3
-          </span>
-        </div>
-        <div class="co-powered">Powered by <strong>SQUARE</strong></div>
-      </div>
-
-      <!-- Crypto pay block -->
-      <div class="checkout-crypto-divider">or pay with crypto</div>
-      <div class="checkout-coin-row" id="co-coin-row">
-        <button class="checkout-coin-btn" data-coin="btc" type="button"><span class="checkout-coin-dot coin-dot-btc"></span>BTC</button>
-        <button class="checkout-coin-btn" data-coin="ltc" type="button"><span class="checkout-coin-dot coin-dot-ltc"></span>LTC</button>
-        <button class="checkout-coin-btn" data-coin="sol" type="button"><span class="checkout-coin-dot coin-dot-sol"></span>SOL</button>
-        <button class="checkout-coin-btn" data-coin="eth" type="button"><span class="checkout-coin-dot coin-dot-eth"></span>ETH</button>
-      </div>
-      <div class="checkout-crypto-panel" id="co-crypto-panel">
-        <div class="checkout-crypto-amount-row">
-          <span>Send exactly</span>
-          <span id="co-crypto-usd"></span>
-        </div>
-        <div class="checkout-crypto-amount" id="co-crypto-amount">—</div>
-        <div class="checkout-crypto-addr" id="co-crypto-addr" title="Click to copy">—</div>
-        <div class="checkout-crypto-copy" id="co-crypto-copy">Click address to copy</div>
-        <button class="checkout-crypto-confirm" id="co-crypto-confirm" type="button">I sent the payment</button>
-        <div class="checkout-crypto-status" id="co-crypto-status"></div>
-        <div class="checkout-crypto-help">Detection is automatic — keep this tab open. First-confirmation typically lands in 1–10 minutes.</div>
-      </div>
-
-      <div class="checkout-init-overlay" id="co-init">
-        <div class="checkout-init-spinner"></div>
-        <div>Loading secure checkout…</div>
-      </div>
-    </section>
+    <div class="checkout-init-overlay" id="co-init">
+      <div class="checkout-init-spinner"></div>
+      <div>Loading secure checkout…</div>
+    </div>
   </div>
 </div>
 
@@ -900,17 +727,6 @@ const PLANS = {
   document.getElementById('co-tier').textContent = cfg.label;
   document.getElementById('co-amount').textContent = priceFmt;
   document.getElementById('co-pay-amount').textContent = priceFmt;
-  const subtotalEl = document.getElementById('co-subtotal');
-  if (subtotalEl) subtotalEl.textContent = priceFmt;
-  // Populate the "What's included" list for this tier.
-  const incEl = document.getElementById('co-includes');
-  if (incEl && Array.isArray(cfg.includes)) {
-    const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-    incEl.innerHTML = cfg.includes.map(function(line){
-      const safe = String(line).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      return '<div class="co-includes-item">' + checkSvg + '<span>' + safe + '</span></div>';
-    }).join('');
-  }
 
   // Wait for Square SDK to be ready (the <script> tag is async-loaded).
   while (!window.Square) await new Promise(r => setTimeout(r, 50));

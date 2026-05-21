@@ -385,6 +385,11 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
   var ut   = params.get('ut') || '';
   var plan = params.get('plan') || '';
   var rEnc = params.get('r') || '';
+  // s = upstream site tag (pornyard | onlybops). The Worker uses this
+  // to pick the right UPSTREAM_CLAIM_URL + PAYMENT_DISCORD_WEBHOOK_URL
+  // per site. Missing/unknown defaults server-side to pornyard for
+  // backward compat with old uts.
+  var site = (params.get('s') || '').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,32);
   if (rEnc) {
     try {
       var b = rEnc.replace(/-/g, '+').replace(/_/g, '/');
@@ -396,6 +401,7 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
   window.__alpha = {
     ut: ut,
     plan: plan,
+    site: site,
     isCheckout: !!(ut && ['basic','premium','exclusive','trt-method'].includes(plan)),
   };
 })();
@@ -845,7 +851,13 @@ const PLANS = {
 
     let r;
     try {
-      const chargeBody = { plan, ut, nonce, verificationToken: verToken };
+      const chargeBody = {
+        plan,
+        ut,
+        nonce,
+        verificationToken: verToken,
+        site: window.__alpha.site || '',
+      };
       r = await fetch(WORKER_BASE + '/api/payments/charge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

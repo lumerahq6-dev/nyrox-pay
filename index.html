@@ -272,6 +272,13 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 @media (max-width:600px){
   #checkout-overlay{padding:0;align-items:stretch}
   .checkout-card{max-width:none;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;justify-content:center;gap:14px;box-shadow:none}
+  /* iOS Safari blows Square's iframe up to ~220px but its parent container
+     stays at the desktop-measured 97px, so the iframe overflows down on top
+     of the Pay button. Brute-force fix: reserve a tall min-height on the
+     card container so the Pay button sits well below the iframe's worst-
+     case rendered height. */
+  #card-container{min-height:260px}
+  .checkout-pay-btn{margin-top:14px}
 }
 
 /* Logo row */

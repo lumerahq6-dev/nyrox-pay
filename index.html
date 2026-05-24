@@ -321,12 +321,15 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 #card-container:focus-within{border-color:rgba(212,168,87,.45);background:rgba(212,168,87,.04)}
 #card-container .sq-card-iframe-container{border-radius:9px}
 /* Square injects a .sq-card-message span for inline validation errors.
-   When empty (the normal case), it still reserves ~22px + default margin,
-   stacking ~45px of dead space between the card inputs and the Pay button
-   below. Collapse it when empty so the Pay button sits flush; keep normal
-   spacing when an error message is present. */
-#card-container .sq-card-message{margin:0;min-height:0;font-size:11px;line-height:1.35;padding-top:4px}
-#card-container .sq-card-message:empty{display:none}
+   When empty (the normal case) Square's own card-wrapper.css still gives
+   it display:block + 11px margin, stacking ~45px of dead space between
+   the card inputs and the Pay button below — most visible on mobile where
+   the Pay button visually crowds the MM/YY/CVV row. Collapse it when empty
+   so the Pay button sits flush; keep normal spacing when an error message
+   is present. !important is required to beat Square's stylesheet which
+   loads after this <style> block. */
+#card-container .sq-card-message{margin:0!important;min-height:0!important;font-size:11px;line-height:1.35;padding-top:4px}
+#card-container .sq-card-message:empty{display:none!important}
 
 .checkout-pay-btn{
   margin-top:6px;padding:15px;border-radius:11px;border:0;

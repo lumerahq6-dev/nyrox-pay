@@ -319,17 +319,27 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
   border-radius:11px;padding:4px 10px;transition:border-color .15s,background .15s;
 }
 #card-container:focus-within{border-color:rgba(212,168,87,.45);background:rgba(212,168,87,.04)}
-#card-container .sq-card-iframe-container{border-radius:9px}
+/* iOS Safari bug: Square's JS sets an inline `height: 97px` on
+   .sq-card-iframe-container based on its desktop measurement, but on iOS the
+   inner <iframe> renders taller (~150-230px) because of larger touch-friendly
+   inputs. The container doesn't grow to match, so the iframe overflows DOWN
+   visually and covers the "Pay $X" button below. Forcing height:auto makes
+   the container shrink-wrap its iframe child so the layout stays consistent.
+   min-height covers the brief window before Square attaches the iframe. */
+#card-container .sq-card-iframe-container{
+  border-radius:9px;
+  height:auto!important;
+  min-height:56px;
+}
 /* Square injects a .sq-card-message span for inline validation errors.
    When empty (the normal case) Square's own card-wrapper.css still gives
-   it display:block + 11px margin, stacking ~45px of dead space between
-   the card inputs and the Pay button below — most visible on mobile where
-   the Pay button visually crowds the MM/YY/CVV row. Collapse it when empty
-   so the Pay button sits flush; keep normal spacing when an error message
-   is present. !important is required to beat Square's stylesheet which
-   loads after this <style> block. */
+   it visibility:hidden + 11px margin, stacking ~45px of dead space between
+   the card inputs and the Pay button below. Collapse it when not actually
+   visible so the Pay button sits flush; Square adds .sq-visible when it
+   wants to show an error. !important is required to beat Square's stylesheet
+   which loads after this <style> block. */
 #card-container .sq-card-message{margin:0!important;min-height:0!important;font-size:11px;line-height:1.35;padding-top:4px}
-#card-container .sq-card-message:empty{display:none!important}
+#card-container .sq-card-message:not(.sq-visible){display:none!important}
 
 .checkout-pay-btn{
   margin-top:6px;padding:15px;border-radius:11px;border:0;

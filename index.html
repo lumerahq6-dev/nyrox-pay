@@ -272,6 +272,9 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 @media (max-width:600px){
   #checkout-overlay{padding:0;align-items:stretch}
   .checkout-card{max-width:none;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;justify-content:center;gap:14px;box-shadow:none}
+  /* Reserve enough vertical room that iOS Safari's bloated Square iframe
+     can't overflow onto the Pay button. */
+  #card-container{min-height:180px!important}
 }
 
 /* Logo row */

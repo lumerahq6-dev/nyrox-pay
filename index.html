@@ -271,7 +271,10 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
 }
 @media (max-width:600px){
   #checkout-overlay{padding:0;align-items:stretch}
-  .checkout-card{max-width:none;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;justify-content:center;gap:14px;box-shadow:none}
+  /* No justify-content:center here. With min-height:100vh and content taller
+     than the viewport, centering pushes the top items off-screen above the
+     URL bar. Top-aligned flow keeps the descriptor strip visible. */
+  .checkout-card{max-width:none;min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:36px 22px;gap:14px;box-shadow:none}
   /* Small buffer so the Pay button sits clear of the Square iframe
      once iOS Safari paints its larger touch-friendly inputs. */
   #card-container{min-height:130px!important}

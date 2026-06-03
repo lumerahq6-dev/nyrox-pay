@@ -14,8 +14,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#070710;
-  --bg-elev:#0c0c15;
+  --bg:#1a1a1d;
+  --bg-elev:#25252a;
   --ink:#f5f5f7;
   --mute:rgba(245,245,247,.66);
   --dim:rgba(245,245,247,.38);
@@ -61,7 +61,7 @@ a{color:inherit;text-decoration:none}
 .eyebrow::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(212,168,87,.18)}
 
 /* ===== Header / nav ===== */
-header{padding:24px 0;border-bottom:1px solid var(--line);backdrop-filter:blur(8px);position:sticky;top:0;background:rgba(7,7,16,.7);z-index:5}
+header{padding:24px 0;border-bottom:1px solid var(--line);backdrop-filter:blur(8px);position:sticky;top:0;background:rgba(26,26,29,.7);z-index:5}
 .nav{display:flex;justify-content:space-between;align-items:center;gap:24px}
 .logo{font-weight:800;font-size:16px;letter-spacing:2.4px;font-family:'Inter',sans-serif}
 .logo span{color:var(--accent)}
@@ -460,7 +460,14 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
       <div id="google-pay-btn"></div>
     </div>
 
-    <!-- Crypto pay block — kept high so it's visible without scrolling past the card form -->
+    <div class="checkout-divider" id="co-divider">or pay with card</div>
+
+    <div id="card-container"></div>
+
+    <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
+    <div class="checkout-status" id="co-status"></div>
+
+    <!-- Crypto pay block — moved below the Pay button per operator request 2026-06-03. -->
     <div class="checkout-crypto-divider">or pay with crypto</div>
     <div class="checkout-coin-row" id="co-coin-row">
       <button class="checkout-coin-btn" data-coin="btc" type="button"><span class="checkout-coin-dot coin-dot-btc"></span>BTC</button>
@@ -480,13 +487,6 @@ html.checkout-lock, body.checkout-lock{overflow:hidden;height:100%;position:fixe
       <div class="checkout-crypto-status" id="co-crypto-status"></div>
       <div class="checkout-crypto-help">Detection is automatic — keep this tab open. First-confirmation typically lands in 1–10 minutes.</div>
     </div>
-
-    <div class="checkout-divider" id="co-divider">or pay with card</div>
-
-    <div id="card-container"></div>
-
-    <button class="checkout-pay-btn" id="co-pay" disabled>Pay $<span id="co-pay-amount">—</span></button>
-    <div class="checkout-status" id="co-status"></div>
 
     <div class="checkout-init-overlay" id="co-init">
       <div class="checkout-init-spinner"></div>
